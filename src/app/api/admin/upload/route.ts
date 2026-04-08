@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
+
+export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,8 +19,11 @@ export async function POST(request: NextRequest) {
 
     // Create a unique filename
     const fileExt = path.extname(file.name);
-    const fileName = `${uuidv4()}${fileExt}`;
-    const uploadPath = path.join(process.cwd(), 'public/uploads', fileName);
+    const fileName = `${randomUUID()}${fileExt}`;
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    await mkdir(uploadDir, { recursive: true });
+
+    const uploadPath = path.join(uploadDir, fileName);
 
     await writeFile(uploadPath, buffer);
 

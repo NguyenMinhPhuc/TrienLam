@@ -72,12 +72,22 @@ export default function ProductsManager() {
     try {
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
-        body
+        body,
+        credentials: 'include',
       });
-      const data = await res.json();
-      if (data.url) {
-        setFormData(prev => ({ ...prev, ImageUrl: data.url }));
+
+      if (!res.ok) {
+        let message = `Tải ảnh thất bại (${res.status})`;
+        try {
+          const data = await res.json();
+          if (data?.error) message = data.error;
+        } catch {}
+        alert(message);
+        return;
       }
+
+      const data = await res.json();
+      if (data.url) setFormData(prev => ({ ...prev, ImageUrl: data.url }));
     } catch (err) {
       alert('Lỗi tải ảnh');
     } finally {

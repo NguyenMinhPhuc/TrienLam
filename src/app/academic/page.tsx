@@ -1,6 +1,8 @@
 import { query, execute } from '@/lib/db';
 import DynamicSection from '@/components/DynamicSection';
 
+export const dynamic = 'force-dynamic';
+
 async function getAcademicSections(): Promise<any[]> {
   try {
     const result = await execute('SELECT * FROM CustomSections WHERE IsActive = 1 AND (PageKey = @pageKey OR PageKey = \'all\') ORDER BY OrderIndex ASC', { pageKey: 'academic' });

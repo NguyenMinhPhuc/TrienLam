@@ -7,6 +7,8 @@ import StatsSection from '@/components/StatsSection';
 import ContactSection from '@/components/ContactSection';
 import DynamicSection from '@/components/DynamicSection';
 
+export const dynamic = 'force-dynamic';
+
 async function getProducts(): Promise<Product[]> {
   try {
     const result = await query('SELECT * FROM Products ORDER BY Year DESC, Id DESC');

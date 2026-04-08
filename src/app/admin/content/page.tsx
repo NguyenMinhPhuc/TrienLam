@@ -66,15 +66,25 @@ export default function ContentManager() {
 
     const res = await fetch('/api/admin/upload', {
       method: 'POST',
-      body: formData
+         body: formData,
+         credentials: 'include',
     });
 
-    if (res.ok) {
+      if (!res.ok) {
+         let message = `Tải ảnh thất bại (${res.status})`;
+         try {
+            const data = await res.json();
+            if (data?.error) message = data.error;
+         } catch {}
+         alert(message);
+         setUploading(null);
+         return;
+      }
+
       const { url } = await res.json();
       setContent(prev => ({ ...prev, [key]: url }));
       setSuccess(key);
       setTimeout(() => setSuccess(null), 3000);
-    }
     setUploading(null);
   };
 

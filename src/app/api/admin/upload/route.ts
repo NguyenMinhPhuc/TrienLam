@@ -21,14 +21,18 @@ export async function POST(request: NextRequest) {
     const fileExt = path.extname(file.name);
     const fileName = `${randomUUID()}${fileExt}`;
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+
+    console.log('Working dir:', process.cwd()); 
+    console.log('Upload dir:', uploadDir);    
+
     await mkdir(uploadDir, { recursive: true });
 
     const uploadPath = path.join(uploadDir, fileName);
 
     await writeFile(uploadPath, buffer);
 
-    // Return the URL
-    const fileUrl = `/uploads/${fileName}`;
+    // Return the URL using out new dynamic route
+    const fileUrl = `/api/uploads/${fileName}`;
     return NextResponse.json({ url: fileUrl });
   } catch (err) {
     console.error('Upload Error:', err);

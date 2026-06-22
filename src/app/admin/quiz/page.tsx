@@ -265,8 +265,8 @@ export default function QuizManager() {
 function ModalWrapper({ children, title, onClose }: any) {
     return (
         <>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[20002]" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[2003] p-10 overflow-hidden">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[20]" />
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[21] p-10 overflow-hidden">
                 <div className="flex justify-between items-center mb-8">
                    <h2 className="text-2xl font-black text-white">{title}</h2>
                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-slate-500"><X size={24} /></button>

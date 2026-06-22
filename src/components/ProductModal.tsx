@@ -1,4 +1,6 @@
 "use client";
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Code2, User, Calendar, Target } from 'lucide-react';
 import { Product } from './ProductCard';
@@ -10,7 +12,26 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
         <>
@@ -20,11 +41,11 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-background/80 backdrop-blur-md z-[2000]"
+            className="fixed inset-0 bg-background/80 backdrop-blur-md z-[99998]"
           />
 
           {/* Modal Container */}
-          <div className="fixed inset-0 flex items-center justify-center z-[2001] p-4 pointer-events-none">
+          <div className="fixed inset-0 flex items-center justify-center z-[99999] p-4 pointer-events-none">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -52,7 +73,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               </div>
 
               {/* Content Section */}
-              <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto">
+              <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto bg-background">
                 <button 
                   onClick={onClose}
                   className="absolute top-6 right-6 p-2 bg-card-bg hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-foreground"
@@ -128,6 +149,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           </div>
         </>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }

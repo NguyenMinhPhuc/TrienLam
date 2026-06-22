@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-lhu-blue: #005696;
   --color-lhu-orange: #f37021;
   --color-lhu-red: #e31837;
   --color-lhu-dark: #0a0f1a;
+  
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-muted: var(--muted);
   
   --font-sans: 'Roboto', ui-sans-serif, system-ui, sans-serif;
 }

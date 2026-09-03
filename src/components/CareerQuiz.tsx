@@ -29,37 +29,63 @@ interface CareerQuizProps {
   quizData: {
     questions: QuizQuestion[];
     results: Record<string, QuizResult>;
+    industries?: { Id: number; IndustryKey: string; Title: string; Description?: string }[];
   };
 }
 
 export default function CareerQuiz({ products, quizData }: CareerQuizProps) {
   const [step, setStep] = useState<'start' | 'question' | 'result'>('start');
   const [currentQ, setCurrentQ] = useState(0);
-  const [scores, setScores] = useState<Record<string, number>>({ AI: 0, Frontend: 0, Backend: 0 });
-  const [winner, setWinner] = useState('AI');
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [winner, setWinner] = useState<string | null>(null);
+  const [industryWinner, setIndustryWinner] = useState<string | null>(null);
 
   const { questions, results } = quizData;
+  const industries = quizData.industries || [];
 
   const handleAnswer = (type: string) => {
-    setScores(prev => ({ ...prev, [type]: (prev[type] || 0) + 1 }));
+    // update scores synchronously using new object
+    const newScores = { ...scores };
+    newScores[type] = (newScores[type] || 0) + 1;
+    setScores(newScores);
+
     if (currentQ < questions.length - 1) {
       setCurrentQ(prev => prev + 1);
     } else {
-      calculateWinner();
+      calculateWinner(newScores);
       setStep('result');
     }
   };
 
-  const calculateWinner = () => {
+  const calculateWinner = (finalScores: Record<string, number>) => {
+    // find top ResultKey
     let maxScore = -1;
-    let winningType = 'AI';
-    Object.entries(scores).forEach(([type, score]) => {
-      if (score > maxScore) {
+    let winningType: string | null = null;
+    Object.entries(finalScores).forEach(([type, score]) => {
+      if (score > maxScore || winningType === null) {
         maxScore = score;
         winningType = type;
       }
     });
     setWinner(winningType);
+
+    // aggregate by industry
+    const industryScores: Record<string, number> = {};
+    Object.entries(finalScores).forEach(([resultKey, score]) => {
+      const res = results[resultKey];
+      const industryKey = res?.IndustryKey || res?.Industry || 'unknown';
+      industryScores[industryKey] = (industryScores[industryKey] || 0) + (score || 0);
+    });
+
+    let maxInd = -1;
+    let winInd: string | null = null;
+    Object.entries(industryScores).forEach(([ind, sc]) => {
+      if (sc > maxInd || winInd === null) {
+        maxInd = sc;
+        winInd = ind;
+      }
+    });
+    setIndustryWinner(winInd);
   };
 
   const IconComponent = ({ name, size = 24, className }: { name: string, size?: number, className?: string }) => {
@@ -136,8 +162,11 @@ export default function CareerQuiz({ products, quizData }: CareerQuizProps) {
               >
                 <h2 className="text-3xl font-bold mb-4 text-muted">Chúc mừng! Bạn là:</h2>
                 <h1 className="text-5xl md:text-6xl font-black gradient-text mb-8">
-                   {results[winner] ? results[winner].Title : winner}
+                   {winner && results[winner] ? results[winner].Title : (winner || 'Kết quả chưa rõ')}
                 </h1>
+                 {industryWinner && (
+                  <p className="text-muted mb-4">Ngành phù hợp: <span className="font-bold">{industryWinner}</span></p>
+                 )}
                 <div className="w-24 h-24 bg-lhu-blue rounded-3xl flex items-center justify-center mb-8 shadow-2xl shadow-lhu-blue/50 text-white">
                   {results[winner] ? (
                     <IconComponent name={results[winner].IconName} size={48} />

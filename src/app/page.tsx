@@ -55,23 +55,25 @@ async function getStats(): Promise<any[]> {
 
 async function getQuizData() {
   try {
-    const [questionsRes, optionsRes, resultsRes] = await Promise.all([
+    const [questionsRes, optionsRes, resultsRes, industriesRes] = await Promise.all([
       query('SELECT * FROM QuizQuestions ORDER BY OrderIndex ASC'),
       query('SELECT * FROM QuizOptions ORDER BY OrderIndex ASC'),
-      query('SELECT * FROM QuizResults')
+      query('SELECT * FROM QuizResults'),
+      query('SELECT * FROM Industries')
     ]);
-
     const resultsMap: Record<string, any> = {};
     resultsRes.recordset.forEach((r: any) => {
       resultsMap[r.ResultKey] = r;
     });
+
+    const industries = industriesRes.recordset;
 
     const questions = questionsRes.recordset.map((q: any) => ({
       ...q,
       Options: optionsRes.recordset.filter((o: any) => o.QuestionId === q.Id)
     }));
 
-    return { questions, results: resultsMap };
+    return { questions, results: resultsMap, industries };
   } catch (err) {
     console.error('Failed to fetch quiz data:', err);
     return { questions: [], results: {} };

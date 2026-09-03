@@ -1,5 +1,6 @@
 "use client";
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,6 +8,10 @@ import { ThemeToggle } from './ThemeToggle';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Hide global navbar on admin routes to avoid overlap with admin layout
+  if (typeof pathname === 'string' && pathname.startsWith('/admin')) return null;
 
   return (
     <header className="fixed top-0 w-full z-[1000] py-4 bg-background/80 backdrop-blur-xl border-b border-card-border">

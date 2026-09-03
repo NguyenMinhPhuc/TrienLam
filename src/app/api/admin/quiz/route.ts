@@ -3,16 +3,18 @@ import { query, execute, connectDB } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const [questions, options, results] = await Promise.all([
+    const [questions, options, results, industries] = await Promise.all([
       query('SELECT * FROM QuizQuestions ORDER BY OrderIndex ASC'),
       query('SELECT * FROM QuizOptions ORDER BY OrderIndex ASC'),
       query('SELECT * FROM QuizResults'),
+      query('SELECT * FROM Industries')
     ]);
 
     return NextResponse.json({
       questions: questions.recordset,
       options: options.recordset,
-      results: results.recordset
+      results: results.recordset,
+      industries: industries.recordset
     });
   } catch (err) {
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
@@ -31,8 +33,8 @@ export async function POST(req: NextRequest) {
       const { QuestionId, OptionText, ResultType, OrderIndex } = data;
       await execute('INSERT INTO QuizOptions (QuestionId, OptionText, ResultType, OrderIndex) VALUES (@QuestionId, @OptionText, @ResultType, @OrderIndex)', { QuestionId, OptionText, ResultType, OrderIndex });
     } else if (type === 'result') {
-      const { ResultKey, Title, Description, IconName } = data;
-      await execute('INSERT INTO QuizResults (ResultKey, Title, Description, IconName) VALUES (@ResultKey, @Title, @Description, @IconName)', { ResultKey, Title, Description, IconName });
+      const { ResultKey, Title, Description, IconName, IndustryKey } = data;
+      await execute('INSERT INTO QuizResults (ResultKey, Title, Description, IconName, IndustryKey) VALUES (@ResultKey, @Title, @Description, @IconName, @IndustryKey)', { ResultKey, Title, Description, IconName, IndustryKey });
     }
 
     return NextResponse.json({ message: 'Quiz item created' });
@@ -53,8 +55,8 @@ export async function PUT(req: NextRequest) {
         const { Id, OptionText, ResultType, OrderIndex } = data;
         await execute('UPDATE QuizOptions SET OptionText = @OptionText, ResultType = @ResultType, OrderIndex = @OrderIndex WHERE Id = @Id', { Id, OptionText, ResultType, OrderIndex });
       } else if (type === 'result') {
-        const { Id, Title, Description, IconName } = data;
-        await execute('UPDATE QuizResults SET Title = @Title, Description = @Description, IconName = @IconName WHERE Id = @Id', { Id, Title, Description, IconName });
+        const { Id, Title, Description, IconName, IndustryKey } = data;
+        await execute('UPDATE QuizResults SET Title = @Title, Description = @Description, IconName = @IconName, IndustryKey = @IndustryKey WHERE Id = @Id', { Id, Title, Description, IconName, IndustryKey });
       }
   
       return NextResponse.json({ message: 'Quiz item updated' });

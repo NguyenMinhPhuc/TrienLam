@@ -38,6 +38,13 @@ interface QuizResult {
   IconName: string;
 }
 
+interface Industry {
+   Id: number;
+   IndustryKey: string;
+   Title: string;
+   Description?: string;
+}
+
 const ICON_OPTIONS = [
   'Code', 'Cpu', 'Globe', 'Zap', 'Users', 'Star', 'Award', 'BookOpen', 
   'Briefcase', 'Shield', 'Activity', 'TrendingUp', 'Lightbulb', 
@@ -49,6 +56,7 @@ export default function QuizManager() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [options, setOptions] = useState<QuizOption[]>([]);
   const [results, setResults] = useState<QuizResult[]>([]);
+   const [industries, setIndustries] = useState<Industry[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Form Modals
@@ -73,7 +81,8 @@ export default function QuizManager() {
         const data = await res.json();
         setQuestions(data.questions);
         setOptions(data.options);
-        setResults(data.results);
+            setResults(data.results);
+            setIndustries(data.industries || []);
     }
     setLoading(false);
   };
@@ -250,6 +259,15 @@ export default function QuizManager() {
                       <option value="">Chọn Icon</option>
                       {ICON_OPTIONS.map(opt => (
                          <option key={opt} value={opt}>{opt}</option>
+                      ))}
+                   </select>
+                </div>
+                <div className="space-y-2">
+                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Ngành (Industry)</label>
+                   <select value={(rFormData as any).IndustryKey || ''} onChange={e => setRFormData({...rFormData, IndustryKey: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none">
+                      <option value="">Không gán ngành</option>
+                      {industries.map(i => (
+                        <option key={i.IndustryKey} value={i.IndustryKey}>{i.Title}</option>
                       ))}
                    </select>
                 </div>

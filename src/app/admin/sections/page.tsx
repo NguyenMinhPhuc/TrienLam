@@ -170,6 +170,63 @@ export default function SectionsManager() {
     return Icon ? <Icon size={size} className={className} /> : <LucideIcons.HelpCircle size={size} className={className} />;
   };
 
+   function SectionPreview({ contentJson, layoutType, bgStyle }: { contentJson: string; layoutType: string; bgStyle: string }) {
+      let items: any[] = [];
+      try {
+         const parsed = JSON.parse(contentJson || '[]');
+         items = Array.isArray(parsed) ? parsed : [parsed];
+      } catch (e) {
+         items = [];
+      }
+
+      if (layoutType === 'script-embed') {
+         return (
+            <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-center text-slate-400 text-xs">
+               <div className="font-bold text-sm text-white mb-2">Script Embed</div>
+               <div className="text-[11px]">{items[0]?.src ? <span className="text-green-400">{items[0].src}</span> : <span className="text-slate-500 italic">Chưa cấu hình src</span>}</div>
+            </div>
+         );
+      }
+
+      if (layoutType === 'timeline') {
+         return (
+            <div className="grid grid-cols-1 gap-3">
+               {items.slice(0, 3).map((it, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 bg-white/5 border border-white/5 rounded-lg">
+                     <div className="w-8 h-8 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue">
+                        <IconComponent name={it.icon || 'HelpCircle'} size={14} />
+                     </div>
+                     <div className="flex-1">
+                        <div className="text-sm font-bold text-white line-clamp-1">{it.title || 'Tiêu đề'}</div>
+                        <div className="text-xs text-slate-400 line-clamp-2">{it.body || ''}</div>
+                     </div>
+                  </div>
+               ))}
+            </div>
+         );
+      }
+
+      // Default: grid preview
+      return (
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {items.slice(0, 4).map((it, i) => (
+               <div key={i} className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue">
+                     <IconComponent name={it.icon || 'HelpCircle'} size={16} />
+                  </div>
+                  <div>
+                     <div className="text-sm font-bold text-white line-clamp-1">{it.title || 'Tiêu đề'}</div>
+                     <div className="text-xs text-slate-400 line-clamp-2">{it.body || ''}</div>
+                  </div>
+               </div>
+            ))}
+            {items.length === 0 && (
+               <div className="p-4 bg-white/5 border border-white/5 rounded-2xl text-slate-500 text-sm">Chưa có nội dung</div>
+            )}
+         </div>
+      );
+   }
+
   return (
     <div className="space-y-8 pb-32">
       {/* Header */}
@@ -240,8 +297,8 @@ export default function SectionsManager() {
                 </div>
              </div>
 
-             <div className="flex-1 bg-black/20 rounded-2xl p-4 border border-white/5 font-mono text-[10px] text-slate-500 overflow-hidden line-clamp-3 text-ellipsis">
-                {s.ContentJson}
+             <div className="flex-1">
+                <SectionPreview contentJson={s.ContentJson} layoutType={s.LayoutType} bgStyle={s.BgStyle} />
              </div>
 
              <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">

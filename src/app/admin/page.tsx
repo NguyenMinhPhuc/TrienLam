@@ -28,7 +28,7 @@ export default function AdminLogin() {
       } else {
         setError('Mật khẩu không chính xác. Vui lòng thử lại.');
       }
-    } catch (err) {
+    } catch {
       setError('Đã xảy ra lỗi hệ thống.');
     } finally {
       setLoading(false);
@@ -59,11 +59,14 @@ export default function AdminLogin() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Mật khẩu quản trị</label>
+              <label htmlFor="admin-password" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Mật khẩu quản trị</label>
               <div className="relative">
                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500" size={20} />
                 <input 
-                  type="password" 
+                id="admin-password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-14 p-5 bg-white/5 border border-white/10 rounded-2xl text-white focus:border-lhu-blue outline-none transition-all"

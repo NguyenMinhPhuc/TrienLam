@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query, execute } from '@/lib/db';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const result = await query('SELECT * FROM SiteContent');
     return NextResponse.json(result.recordset);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
   }
 }

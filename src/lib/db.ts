@@ -29,7 +29,9 @@ export async function query(q: string) {
   return db.request().query(q);
 }
 
-export async function execute(q: string, params: Record<string, any>) {
+type SqlParameter = string | number | boolean | Date | Buffer | null | undefined;
+
+export async function execute(q: string, params: Record<string, SqlParameter>) {
   const db = await connectDB();
   const request = db.request();
   Object.entries(params).forEach(([name, value]) => {

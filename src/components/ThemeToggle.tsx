@@ -5,12 +5,12 @@ import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function ThemeToggle() {
-  const { theme, setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { setTheme, resolvedTheme } = useTheme();
+  const mounted = React.useSyncExternalStore(
+    () => () => undefined,
+    () => true,
+    () => false,
+  );
 
   if (!mounted) {
     return <div className="p-2 w-10 h-10" />;
@@ -21,8 +21,8 @@ export function ThemeToggle() {
   return (
     <button
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all focus:outline-none"
-      aria-label="Toggle Theme"
+      className="relative p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lhu-orange"
+      aria-label={isDark ? 'Chuyển sang giao diện sáng' : 'Chuyển sang giao diện tối'}
     >
       <div className="relative w-6 h-6 overflow-hidden">
         <AnimatePresence mode="wait" initial={false}>

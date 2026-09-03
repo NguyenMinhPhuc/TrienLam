@@ -1,9 +1,11 @@
-import { query, execute } from '@/lib/db';
+import { execute } from '@/lib/db';
 import DynamicSection from '@/components/DynamicSection';
+import type { Product } from '@/components/ProductCard';
+import type { CustomSectionData } from '@/lib/types';
 
 export const dynamic = 'force-dynamic';
 
-async function getAcademicSections(): Promise<any[]> {
+async function getAcademicSections(): Promise<CustomSectionData[]> {
   try {
     const result = await execute('SELECT * FROM CustomSections WHERE IsActive = 1 AND (PageKey = @pageKey OR PageKey = \'all\') ORDER BY OrderIndex ASC', { pageKey: 'academic' });
     return result.recordset;
@@ -13,7 +15,7 @@ async function getAcademicSections(): Promise<any[]> {
   }
 }
 
-async function getProducts(): Promise<any[]> {
+async function getProducts(): Promise<Product[]> {
   try {
     const result = await execute('SELECT * FROM Products ORDER BY Year DESC, Id DESC', {});
     return result.recordset;

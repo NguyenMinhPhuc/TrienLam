@@ -3,7 +3,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --incremental false",
+    "db:migrate": "node --env-file=.env scripts/run-migrations.mjs",
+    "db:seed-academic": "node --env-file=.env scripts/seed-academic.mjs"
   },
   "dependencies": {
     "framer-motion": "^12.38.0",

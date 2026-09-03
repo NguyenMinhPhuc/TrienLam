@@ -1,9 +1,9 @@
 "use client";
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
 import Script from 'next/script';
 import ProductGallery from './ProductGallery';
 import { Product } from './ProductCard';
+import DynamicIcon from './DynamicIcon';
 
 interface ContentItem {
   title: string;
@@ -17,6 +17,7 @@ interface ContentItem {
 }
 
 interface DynamicSectionProps {
+  anchorId?: string;
   title: string;
   subtitle?: string;
   layoutType: string;
@@ -26,6 +27,7 @@ interface DynamicSectionProps {
 }
 
 export default function DynamicSection({ 
+  anchorId,
   title, 
   subtitle, 
   layoutType, 
@@ -59,15 +61,9 @@ export default function DynamicSection({
     }
   };
 
-  // Helper to render icon by name
-  const IconComponent = ({ name, size = 24 }: { name: string, size?: number }) => {
-    const Icon = (LucideIcons as any)[name];
-    return Icon ? <Icon size={size} /> : <LucideIcons.HelpCircle size={size} />;
-  };
-
   if (layoutType === 'product-showcase') {
     return (
-      <section className={`py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
+      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
@@ -82,7 +78,7 @@ export default function DynamicSection({
 
   if (layoutType === 'timeline') {
     return (
-      <section className={`py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
+      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
@@ -108,7 +104,7 @@ export default function DynamicSection({
                     <div className="flex-1 w-full">
                        <div className={`p-8 bg-card-bg backdrop-blur-2xl border border-card-border rounded-[28px] shadow-xl hover:border-lhu-blue/40 transition-all ${idx % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
                           <div className={`w-12 h-12 bg-lhu-blue/10 rounded-2xl flex items-center justify-center mb-6 text-lhu-blue ${idx % 2 === 0 ? 'md:ml-auto' : 'md:mr-auto'}`}>
-                             <IconComponent name={item.icon} size={24} />
+                             <DynamicIcon name={item.icon} size={24} />
                           </div>
                           <h3 className="text-2xl font-bold mb-3 text-foreground">{item.title}</h3>
                           <p className="text-muted leading-relaxed">{item.body}</p>
@@ -135,7 +131,7 @@ export default function DynamicSection({
     // ... (rest of the script-embed logic is fine)
     const scriptData = items[0];
     return (
-      <section className={`py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
+      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
@@ -184,7 +180,7 @@ export default function DynamicSection({
   }
 
   return (
-    <section className={`py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
+    <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-20">
           <motion.h2 
@@ -218,7 +214,7 @@ export default function DynamicSection({
               className="bg-card-bg backdrop-blur-xl border border-card-border p-10 rounded-[24px] hover:border-lhu-blue/50 transition-all group hover:shadow-2xl"
             >
               <div className="w-14 h-14 bg-lhu-blue/10 rounded-2xl flex items-center justify-center mb-8 text-lhu-blue group-hover:bg-lhu-blue group-hover:text-white transition-all shadow-lg border border-lhu-blue/20">
-                <IconComponent name={item.icon} size={28} />
+                <DynamicIcon name={item.icon} size={28} />
               </div>
               <h3 className="text-2xl font-bold mb-4 text-foreground">{item.title}</h3>
               <p className="text-muted leading-relaxed">{item.body}</p>

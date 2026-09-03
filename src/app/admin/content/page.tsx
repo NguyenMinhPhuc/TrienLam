@@ -1,19 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
 import { 
-  Settings, 
   Save, 
   Type, 
-  AlignLeft, 
   MapPin, 
-  Phone, 
-  Mail,
   CheckCircle2,
-  AlertCircle,
   ImagePlus
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 
 interface ContentItem {
   SectionKey: string;
@@ -27,22 +21,26 @@ export default function ContentManager() {
   const [uploading, setUploading] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const res = await fetch('/api/admin/content');
-    if (res.ok) {
-        const data: ContentItem[] = await res.json();
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch('/api/admin/content')
+      .then(async (res) => res.ok ? res.json() as Promise<ContentItem[]> : [])
+      .then((data) => {
+        if (cancelled) return;
         const map: Record<string, string> = {};
-        data.forEach(item => {
-            map[item.SectionKey] = item.Content;
+        data.forEach((item) => {
+          map[item.SectionKey] = item.Content;
         });
         setContent(map);
-    }
-    setLoading(false);
-  };
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-  useEffect(() => {
-    fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleUpdate = async (key: string) => {
@@ -221,9 +219,9 @@ export default function ContentManager() {
 
                       {/* Footer configuration controls */}
                       <div className="space-y-6">
-                           <label className="text-sm font-bold">Bố cục Footer</label>
+                           <label htmlFor="footer-layout" className="text-sm font-bold">Bố cục Footer</label>
                            <div className="flex items-center gap-3">
-                              <select value={content.footer_layout || '3-col'} onChange={e => setContent({...content, footer_layout: e.target.value})} className="p-3 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none">
+                              <select id="footer-layout" value={content.footer_layout || '3-col'} onChange={e => setContent({...content, footer_layout: e.target.value})} className="p-3 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none">
                                  <option value="1-col">1 cột (Center)</option>
                                  <option value="2-col">2 cột</option>
                                  <option value="3-col">3 cột</option>
@@ -233,15 +231,15 @@ export default function ContentManager() {
 
                            <div className="flex items-center gap-4">
                               <label className="flex items-center gap-2">
-                                 <input type="checkbox" checked={content.footer_show_map === '1' || content.footer_show_map === true} onChange={e => setContent({...content, footer_show_map: e.target.checked ? '1' : '0'})} className="w-5 h-5" />
+                                  <input type="checkbox" checked={content.footer_show_map === '1' || content.footer_show_map === 'true'} onChange={e => setContent({...content, footer_show_map: e.target.checked ? '1' : '0'})} className="w-5 h-5" />
                                  <span className="text-sm">Hiển thị bản đồ</span>
                               </label>
                               <button onClick={() => handleUpdate('footer_show_map')} className="px-4 py-3 bg-lhu-blue text-white rounded-2xl">Lưu</button>
                            </div>
 
                            <div>
-                              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Embed bản đồ (iframe)</label>
-                              <textarea rows={3} value={content.footer_map_embed || ''} onChange={e => setContent({...content, footer_map_embed: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                              <label htmlFor="footer-map-embed" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Embed bản đồ (iframe)</label>
+                              <textarea id="footer-map-embed" rows={3} value={content.footer_map_embed || ''} onChange={e => setContent({...content, footer_map_embed: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               <div className="mt-2">
                                  <button onClick={() => handleUpdate('footer_map_embed')} className="px-4 py-3 bg-lhu-blue text-white rounded-2xl">Lưu embed</button>
                               </div>
@@ -249,28 +247,28 @@ export default function ContentManager() {
 
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div>
-                                 <label className="text-sm font-bold">Liên kết Facebook</label>
-                                 <input type="text" value={content.footer_social_facebook || ''} onChange={e => setContent({...content, footer_social_facebook: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-facebook" className="text-sm font-bold">Liên kết Facebook</label>
+                                 <input id="footer-facebook" type="url" value={content.footer_social_facebook || ''} onChange={e => setContent({...content, footer_social_facebook: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                               <div>
-                                 <label className="text-sm font-bold">Liên kết Zalo</label>
-                                 <input type="text" value={content.footer_social_zalo || ''} onChange={e => setContent({...content, footer_social_zalo: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-zalo" className="text-sm font-bold">Liên kết Zalo</label>
+                                 <input id="footer-zalo" type="url" value={content.footer_social_zalo || ''} onChange={e => setContent({...content, footer_social_zalo: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                               <div>
-                                 <label className="text-sm font-bold">Liên kết Instagram</label>
-                                 <input type="text" value={content.footer_social_instagram || ''} onChange={e => setContent({...content, footer_social_instagram: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-instagram" className="text-sm font-bold">Liên kết Instagram</label>
+                                 <input id="footer-instagram" type="url" value={content.footer_social_instagram || ''} onChange={e => setContent({...content, footer_social_instagram: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                               <div>
-                                 <label className="text-sm font-bold">Liên kết YouTube</label>
-                                 <input type="text" value={content.footer_social_youtube || ''} onChange={e => setContent({...content, footer_social_youtube: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-youtube" className="text-sm font-bold">Liên kết YouTube</label>
+                                 <input id="footer-youtube" type="url" value={content.footer_social_youtube || ''} onChange={e => setContent({...content, footer_social_youtube: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                               <div>
-                                 <label className="text-sm font-bold">Liên kết LinkedIn</label>
-                                 <input type="text" value={content.footer_social_linkedin || ''} onChange={e => setContent({...content, footer_social_linkedin: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-linkedin" className="text-sm font-bold">Liên kết LinkedIn</label>
+                                 <input id="footer-linkedin" type="url" value={content.footer_social_linkedin || ''} onChange={e => setContent({...content, footer_social_linkedin: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                               <div>
-                                 <label className="text-sm font-bold">Liên kết TikTok</label>
-                                 <input type="text" value={content.footer_social_tiktok || ''} onChange={e => setContent({...content, footer_social_tiktok: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
+                                 <label htmlFor="footer-tiktok" className="text-sm font-bold">Liên kết TikTok</label>
+                                 <input id="footer-tiktok" type="url" value={content.footer_social_tiktok || ''} onChange={e => setContent({...content, footer_social_tiktok: e.target.value})} className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-sm outline-none" />
                               </div>
                            </div>
 
@@ -287,19 +285,34 @@ export default function ContentManager() {
   );
 }
 
-function ContentCard({ label, value, onChange, onSave, onUpload, isSaving, isUploading, isSuccess, textarea, rows = 3 }: any) {
+interface ContentCardProps {
+   label: string;
+   value: string;
+   onChange: (value: string) => void;
+   onSave: () => void;
+   onUpload?: (file: File) => void;
+   isSaving: boolean;
+   isUploading?: boolean;
+   isSuccess: boolean;
+   textarea?: boolean;
+   rows?: number;
+}
+
+function ContentCard({ label, value, onChange, onSave, onUpload, isSaving, isUploading, isSuccess, textarea, rows = 3 }: ContentCardProps) {
    const fileInputRef = React.useRef<HTMLInputElement>(null);
+   const fieldId = React.useId();
 
    return (
       <div className="bg-white/5 border border-white/10 p-6 md:p-8 rounded-[20px] space-y-4 hover:border-white/20 transition-all font-medium text-foreground">
          <div className="flex justify-between items-center">
-            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{label}</label>
-            {isSuccess && <span className="text-green-500 text-[10px] font-bold flex items-center gap-1 animate-bounce"><CheckCircle2 size={12} /> Đã lưu</span>}
+            <label htmlFor={fieldId} className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">{label}</label>
+            {isSuccess && <span role="status" className="text-green-500 text-[10px] font-bold flex items-center gap-1"><CheckCircle2 size={12} /> Đã lưu</span>}
          </div>
          
          <div className="relative group/input">
             {textarea ? (
                <textarea 
+                  id={fieldId}
                   rows={rows}
                   value={value}
                   onChange={(e) => onChange(e.target.value)}
@@ -308,6 +321,7 @@ function ContentCard({ label, value, onChange, onSave, onUpload, isSaving, isUpl
             ) : (
                <div className="relative">
                   <input 
+                     id={fieldId}
                      type="text"
                      value={value}
                      onChange={(e) => onChange(e.target.value)}
@@ -317,7 +331,8 @@ function ContentCard({ label, value, onChange, onSave, onUpload, isSaving, isUpl
                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
                         <button 
                            type="button"
-                           disabled={isUploading}
+                            disabled={isUploading}
+                            aria-label={`Tải ảnh cho ${label}`}
                            onClick={() => fileInputRef.current?.click()}
                            className="p-2 bg-slate-800 hover:bg-lhu-blue text-slate-400 hover:text-white rounded-xl transition-all"
                            title="Tải ảnh từ máy tính"
@@ -355,16 +370,9 @@ function ContentCard({ label, value, onChange, onSave, onUpload, isSaving, isUpl
    );
 }
 
-function FooterPreview({ content }: { content: Record<string, any> }) {
-   const RenderIcon = ({ name }: { name: string }) => {
-      const Icon = (LucideIcons as any)[name];
-      if (Icon) return <Icon size={18} />;
-      const Fallback = (LucideIcons as any)['Globe'] || Object.values(LucideIcons)[0];
-      return Fallback ? <Fallback size={18} /> : null;
-   };
-
+function FooterPreview({ content }: { content: Record<string, string> }) {
    const layout = content.footer_layout || '3-col';
-   const showMap = content.footer_show_map === '1' || content.footer_show_map === true;
+   const showMap = content.footer_show_map === '1' || content.footer_show_map === 'true';
    const mapEmbed = content.footer_map_embed || '';
 
    const socials = {
@@ -387,9 +395,9 @@ function FooterPreview({ content }: { content: Record<string, any> }) {
                <div className="font-bold text-white">{content.footer_title || 'Tiêu đề Footer'}</div>
                <div className="text-sm text-slate-400">{content.footer_address || 'Địa chỉ...'}</div>
                <div className="mt-3 flex items-center justify-center gap-3 text-slate-300">
-                  {socials.facebook && <a href={socials.facebook}><RenderIcon name="Facebook" /></a>}
-                  {socials.zalo && <a href={socials.zalo}><RenderIcon name="MessageSquare" /></a>}
-                  {socials.instagram && <a href={socials.instagram}><RenderIcon name="Instagram" /></a>}
+                  {socials.facebook && <a aria-label="Facebook" href={socials.facebook}><DynamicIcon name="Facebook" size={18} /></a>}
+                  {socials.zalo && <a aria-label="Zalo" href={socials.zalo}><DynamicIcon name="MessageSquare" size={18} /></a>}
+                  {socials.instagram && <a aria-label="Instagram" href={socials.instagram}><DynamicIcon name="Instagram" size={18} /></a>}
                </div>
             </div>
          )}
@@ -401,9 +409,9 @@ function FooterPreview({ content }: { content: Record<string, any> }) {
                   <div className="text-sm text-slate-400">{content.footer_address || 'Địa chỉ...'}</div>
                </div>
                <div className="flex items-center justify-end gap-3 text-slate-300">
-                  {socials.facebook && <a href={socials.facebook}><RenderIcon name="Facebook" /></a>}
-                  {socials.zalo && <a href={socials.zalo}><RenderIcon name="MessageSquare" /></a>}
-                  {socials.instagram && <a href={socials.instagram}><RenderIcon name="Instagram" /></a>}
+                  {socials.facebook && <a aria-label="Facebook" href={socials.facebook}><DynamicIcon name="Facebook" size={18} /></a>}
+                  {socials.zalo && <a aria-label="Zalo" href={socials.zalo}><DynamicIcon name="MessageSquare" size={18} /></a>}
+                  {socials.instagram && <a aria-label="Instagram" href={socials.instagram}><DynamicIcon name="Instagram" size={18} /></a>}
                </div>
             </div>
          )}
@@ -413,9 +421,9 @@ function FooterPreview({ content }: { content: Record<string, any> }) {
                <div className="font-bold text-white">{content.footer_title || 'Tiêu đề Footer'}</div>
                <div className="text-sm text-slate-400">{content.footer_address || 'Địa chỉ...'}</div>
                <div className="flex gap-3 text-slate-300">
-                  {socials.facebook && <a href={socials.facebook}><RenderIcon name="Facebook" /></a>}
-                  {socials.zalo && <a href={socials.zalo}><RenderIcon name="MessageSquare" /></a>}
-                  {socials.instagram && <a href={socials.instagram}><RenderIcon name="Instagram" /></a>}
+                  {socials.facebook && <a aria-label="Facebook" href={socials.facebook}><DynamicIcon name="Facebook" size={18} /></a>}
+                  {socials.zalo && <a aria-label="Zalo" href={socials.zalo}><DynamicIcon name="MessageSquare" size={18} /></a>}
+                  {socials.instagram && <a aria-label="Instagram" href={socials.instagram}><DynamicIcon name="Instagram" size={18} /></a>}
                </div>
             </div>
          )}

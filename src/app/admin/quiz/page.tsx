@@ -2,19 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  HelpCircle, 
   Plus, 
   Edit2, 
   Trash2, 
   X, 
-  MessageSquare, 
-  Languages, 
-  ShoppingCart,
-  CheckCircle2,
   ListFilter,
   Trophy
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 
 interface QuizOption {
   Id: number;
@@ -36,6 +31,7 @@ interface QuizResult {
   Title: string;
   Description: string;
   IconName: string;
+  IndustryKey?: string;
 }
 
 interface Industry {
@@ -67,15 +63,12 @@ export default function QuizManager() {
   // Editing States
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
   const [editingOption, setEditingOption] = useState<QuizOption | null>(null);
-  const [editingResult, setEditingResult] = useState<QuizResult | null>(null);
-
   // Form Datas
   const [qFormData, setQFormData] = useState<Partial<QuizQuestion>>({ QuestionText: '', OrderIndex: 0 });
   const [oFormData, setOFormData] = useState<Partial<QuizOption>>({ QuestionId: 0, OptionText: '', ResultType: 'AI', OrderIndex: 0 });
   const [rFormData, setRFormData] = useState<Partial<QuizResult>>({ ResultKey: '', Title: '', Description: '', IconName: 'MessageSquare' });
 
   const fetchData = async () => {
-    setLoading(true);
     const res = await fetch('/api/admin/quiz');
     if (res.ok) {
         const data = await res.json();
@@ -88,10 +81,35 @@ export default function QuizManager() {
   };
 
   useEffect(() => {
-    fetchData();
+    let cancelled = false;
+
+    fetch('/api/admin/quiz')
+      .then(async (res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (cancelled || !data) return;
+        setQuestions(data.questions);
+        setOptions(data.options);
+        setResults(data.results);
+        setIndustries(data.industries || []);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const handleSubmit = async (type: 'question' | 'option' | 'result', data: any, isEdit: boolean) => {
+  if (loading) {
+    return <div className="py-20 text-center text-slate-400">Đang tải dữ liệu trắc nghiệm...</div>;
+  }
+
+  const handleSubmit = async (
+    type: 'question' | 'option' | 'result',
+    data: Partial<QuizQuestion> | Partial<QuizOption> | Partial<QuizResult>,
+    isEdit: boolean,
+  ) => {
     const method = isEdit ? 'PUT' : 'POST';
     const res = await fetch('/api/admin/quiz', {
       method,
@@ -111,11 +129,6 @@ export default function QuizManager() {
     if (!confirm('Bạn có chắc chắn muốn xóa mục này?')) return;
     const res = await fetch(`/api/admin/quiz?type=${type}&id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchData();
-  };
-
-  const IconComponent = ({ name, size = 20, className }: any) => {
-    const Icon = (LucideIcons as any)[name];
-    return Icon ? <Icon size={size} className={className} /> : <LucideIcons.HelpCircle size={size} className={className} />;
   };
 
   return (
@@ -139,9 +152,9 @@ export default function QuizManager() {
                <div key={r.Id} className="bg-white/5 border border-white/10 p-8 rounded-[24px] hover:border-white/20 transition-all font-medium text-foreground">
                   <div className="flex justify-between items-start mb-6">
                      <div className="w-14 h-14 bg-lhu-blue/10 rounded-2xl flex items-center justify-center text-lhu-blue">
-                        <IconComponent name={r.IconName} size={28} />
+                         <DynamicIcon name={r.IconName} size={28} />
                      </div>
-                     <button onClick={() => { setEditingResult(r); setRFormData(r); setIsResultModalOpen(true); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white"><Edit2 size={18} /></button>
+                      <button aria-label={`Sửa kết quả ${r.Title}`} onClick={() => { setRFormData(r); setIsResultModalOpen(true); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white"><Edit2 size={18} /></button>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">{r.Title}</h3>
                   <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{r.Description}</p>
@@ -168,8 +181,8 @@ export default function QuizManager() {
                         <h3 className="text-lg font-bold text-white">{q.QuestionText}</h3>
                      </div>
                      <div className="flex gap-2">
-                        <button onClick={() => { setEditingQuestion(q); setQFormData(q); setIsQuestionModalOpen(true); }} className="p-3 hover:bg-white/10 rounded-xl text-slate-500 hover:text-white"><Edit2 size={18} /></button>
-                        <button onClick={() => handleDelete('question', q.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-slate-500 hover:text-red-500"><Trash2 size={18} /></button>
+                         <button aria-label={`Sửa câu hỏi ${idx + 1}`} onClick={() => { setEditingQuestion(q); setQFormData(q); setIsQuestionModalOpen(true); }} className="p-3 hover:bg-white/10 rounded-xl text-slate-500 hover:text-white"><Edit2 size={18} /></button>
+                         <button aria-label={`Xóa câu hỏi ${idx + 1}`} onClick={() => handleDelete('question', q.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-red-300 hover:text-red-400"><Trash2 size={18} /></button>
                      </div>
                   </div>
                   <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -180,8 +193,8 @@ export default function QuizManager() {
                               <span className="px-2 py-0.5 bg-lhu-blue/10 text-lhu-blue text-[8px] font-black uppercase rounded border border-lhu-blue/20">{opt.ResultType}</span>
                            </div>
                            <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => { setEditingOption(opt); setOFormData(opt); setIsOptionModalOpen(true); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white"><Edit2 size={14} /></button>
-                              <button onClick={() => handleDelete('option', opt.Id)} className="p-2 hover:bg-red-500/10 rounded-lg text-slate-500 hover:text-red-500"><Trash2 size={14} /></button>
+                               <button aria-label={`Sửa lựa chọn ${opt.OptionText}`} onClick={() => { setEditingOption(opt); setOFormData(opt); setIsOptionModalOpen(true); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white"><Edit2 size={14} /></button>
+                               <button aria-label={`Xóa lựa chọn ${opt.OptionText}`} onClick={() => handleDelete('option', opt.Id)} className="p-2 hover:bg-red-500/10 rounded-lg text-red-300 hover:text-red-400"><Trash2 size={14} /></button>
                            </div>
                         </div>
                      ))}
@@ -201,12 +214,12 @@ export default function QuizManager() {
           <ModalWrapper title={editingQuestion ? 'Sửa câu hỏi' : 'Thêm câu hỏi'} onClose={() => setIsQuestionModalOpen(false)}>
              <form onSubmit={(e) => { e.preventDefault(); handleSubmit('question', qFormData, !!editingQuestion); }} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nội dung câu hỏi</label>
-                   <textarea required rows={3} value={qFormData.QuestionText} onChange={e => setQFormData({...qFormData, QuestionText: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
+                   <label htmlFor="quiz-question-text" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nội dung câu hỏi</label>
+                   <textarea id="quiz-question-text" required rows={3} value={qFormData.QuestionText} onChange={e => setQFormData({...qFormData, QuestionText: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự hiển thị</label>
-                   <input type="number" required value={qFormData.OrderIndex} onChange={e => setQFormData({...qFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
+                   <label htmlFor="quiz-question-order" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự hiển thị</label>
+                   <input id="quiz-question-order" type="number" required value={qFormData.OrderIndex} onChange={e => setQFormData({...qFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
                 <button type="submit" className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold">Xác nhận</button>
              </form>
@@ -217,21 +230,21 @@ export default function QuizManager() {
           <ModalWrapper title={editingOption ? 'Sửa lựa chọn' : 'Thêm lựa chọn'} onClose={() => setIsOptionModalOpen(false)}>
              <form onSubmit={(e) => { e.preventDefault(); handleSubmit('option', oFormData, !!editingOption); }} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nội dung lựa chọn</label>
-                   <input required type="text" value={oFormData.OptionText} onChange={e => setOFormData({...oFormData, OptionText: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
+                   <label htmlFor="quiz-option-text" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nội dung lựa chọn</label>
+                   <input id="quiz-option-text" required type="text" value={oFormData.OptionText} onChange={e => setOFormData({...oFormData, OptionText: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Loại nghề nghiệp</label>
-                    <select value={oFormData.ResultType} onChange={e => setOFormData({...oFormData, ResultType: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white">
+                     <label htmlFor="quiz-option-result" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Loại nghề nghiệp</label>
+                     <select id="quiz-option-result" value={oFormData.ResultType} onChange={e => setOFormData({...oFormData, ResultType: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white">
                         <option value="AI">AI Specialist</option>
                         <option value="Frontend">Frontend Developer</option>
                         <option value="Backend">Backend/Data Scientist</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự</label>
-                    <input type="number" required value={oFormData.OrderIndex} onChange={e => setOFormData({...oFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white" />
+                     <label htmlFor="quiz-option-order" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự</label>
+                     <input id="quiz-option-order" type="number" required value={oFormData.OrderIndex} onChange={e => setOFormData({...oFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white" />
                   </div>
                 </div>
                 <button type="submit" className="w-full py-5 bg-lhu-orange text-white rounded-2xl font-bold">Lưu lựa chọn</button>
@@ -243,17 +256,17 @@ export default function QuizManager() {
           <ModalWrapper title="Sửa kết quả trắc nghiệm" onClose={() => setIsResultModalOpen(false)}>
              <form onSubmit={(e) => { e.preventDefault(); handleSubmit('result', rFormData, true); }} className="space-y-6">
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tên nghề nghiệp</label>
-                   <input required type="text" value={rFormData.Title} onChange={e => setRFormData({...rFormData, Title: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
+                   <label htmlFor="quiz-result-title" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tên nghề nghiệp</label>
+                   <input id="quiz-result-title" required type="text" value={rFormData.Title} onChange={e => setRFormData({...rFormData, Title: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Mô tả ngắn</label>
-                   <textarea rows={3} value={rFormData.Description} onChange={e => setRFormData({...rFormData, Description: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white transition-all resize-none" />
+                   <label htmlFor="quiz-result-description" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Mô tả ngắn</label>
+                   <textarea id="quiz-result-description" rows={3} value={rFormData.Description} onChange={e => setRFormData({...rFormData, Description: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white transition-all resize-none" />
                 </div>
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Icon (Chọn biểu tượng)</label>
+                   <label htmlFor="quiz-result-icon" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Icon (Chọn biểu tượng)</label>
                    <select 
-                      value={rFormData.IconName} onChange={e => setRFormData({...rFormData, IconName: e.target.value})}
+                      id="quiz-result-icon" value={rFormData.IconName} onChange={e => setRFormData({...rFormData, IconName: e.target.value})}
                       className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                    >
                       <option value="">Chọn Icon</option>
@@ -263,8 +276,8 @@ export default function QuizManager() {
                    </select>
                 </div>
                 <div className="space-y-2">
-                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Ngành (Industry)</label>
-                   <select value={(rFormData as any).IndustryKey || ''} onChange={e => setRFormData({...rFormData, IndustryKey: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none">
+                   <label htmlFor="quiz-result-industry" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Ngành (Industry)</label>
+                   <select id="quiz-result-industry" value={rFormData.IndustryKey || ''} onChange={e => setRFormData({...rFormData, IndustryKey: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none">
                       <option value="">Không gán ngành</option>
                       {industries.map(i => (
                         <option key={i.IndustryKey} value={i.IndustryKey}>{i.Title}</option>
@@ -280,14 +293,22 @@ export default function QuizManager() {
   );
 }
 
-function ModalWrapper({ children, title, onClose }: any) {
+interface ModalWrapperProps {
+    children: React.ReactNode;
+    title: string;
+    onClose: () => void;
+}
+
+function ModalWrapper({ children, title, onClose }: ModalWrapperProps) {
+    const titleId = React.useId();
+
     return (
         <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[20]" />
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-xl bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[21] p-10 overflow-hidden">
+            <motion.div role="dialog" aria-modal="true" aria-labelledby={titleId} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%_-_2rem)] max-w-xl max-h-[90vh] overflow-y-auto bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[21] p-6 md:p-10">
                 <div className="flex justify-between items-center mb-8">
-                   <h2 className="text-2xl font-black text-white">{title}</h2>
-                   <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-slate-500"><X size={24} /></button>
+                   <h2 id={titleId} className="text-2xl font-black text-white">{title}</h2>
+                   <button aria-label="Đóng biểu mẫu" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-slate-400"><X size={24} /></button>
                 </div>
                 {children}
             </motion.div>

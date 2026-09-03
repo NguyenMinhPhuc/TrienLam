@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, execute, connectDB } from '@/lib/db';
+import { query, execute } from '@/lib/db';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const [questions, options, results, industries] = await Promise.all([
       query('SELECT * FROM QuizQuestions ORDER BY OrderIndex ASC'),
-      query('SELECT * FROM QuizOptions ORDER BY OrderIndex ASC'),
+      query('SELECT * FROM QuizOptions ORDER BY QuestionId ASC, OrderIndex ASC'),
       query('SELECT * FROM QuizResults'),
       query('SELECT * FROM Industries')
     ]);
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       results: results.recordset,
       industries: industries.recordset
     });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
   }
 }
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Quiz item created' });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Insert failed' }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function PUT(req: NextRequest) {
       }
   
       return NextResponse.json({ message: 'Quiz item updated' });
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: 'Update failed' }, { status: 500 });
     }
 }
@@ -82,7 +82,7 @@ export async function DELETE(req: NextRequest) {
       }
   
       return NextResponse.json({ message: 'Quiz item deleted' });
-    } catch (err) {
+    } catch {
       return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
     }
 }

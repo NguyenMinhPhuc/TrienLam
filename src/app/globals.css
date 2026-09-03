@@ -41,6 +41,11 @@ body {
   font-family: var(--font-sans);
 }
 
+:focus-visible {
+  outline: 3px solid var(--color-lhu-orange);
+  outline-offset: 3px;
+}
+
 .glass-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(12px);
@@ -48,10 +53,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, #005696, #f37021);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-lhu-orange);
 }
 
 @keyframes fadeIn {
@@ -61,4 +63,18 @@ body {
 
 .animate-up {
   animation: fadeIn 0.8s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

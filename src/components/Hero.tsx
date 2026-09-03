@@ -8,7 +8,7 @@ interface HeroProps {
 
 export default function Hero({ title, subtitle }: HeroProps) {
   return (
-    <section className="relative h-screen flex items-center overflow-hidden bg-background transition-colors duration-500">
+    <section className="relative min-h-svh flex items-center overflow-hidden bg-background pt-24 transition-colors duration-500">
       <div className="container mx-auto px-4 z-10">
         <motion.h1 
           initial={{ opacity: 0, y: 30 }}
@@ -30,8 +30,8 @@ export default function Hero({ title, subtitle }: HeroProps) {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="flex flex-col md:flex-row gap-6"
         >
-          <a href="#products" className="px-8 py-4 border-2 border-lhu-blue/20 dark:border-white/20 rounded-2xl font-bold hover:bg-lhu-blue/10 dark:hover:bg-white/10 transition-all text-center text-foreground">Khám phá sản phẩm</a>
-          <a href="#quiz" className="px-8 py-4 bg-lhu-orange text-white rounded-2xl font-bold shadow-lg shadow-lhu-orange/30 hover:scale-105 transition-all text-center">Bắt đầu Quiz ngay</a>
+          <a href="#products" className="px-8 py-4 border-2 border-lhu-blue/20 dark:border-white/20 rounded-2xl font-bold hover:bg-lhu-blue/10 dark:hover:bg-white/10 transition-all text-center text-foreground focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lhu-blue/40">Khám phá sản phẩm</a>
+          <a href="#quiz" className="px-8 py-4 bg-lhu-orange text-white rounded-2xl font-bold shadow-lg shadow-lhu-orange/30 hover:scale-105 transition-all text-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lhu-orange/40">Bắt đầu Quiz ngay</a>
         </motion.div>
       </div>
       

@@ -2,20 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Layers, 
   Plus, 
   Edit2, 
   Trash2, 
   X, 
-  Check, 
   Eye, 
   EyeOff, 
   ChevronUp, 
   ChevronDown,
-  Layout,
-  Code
+  Layout
 } from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 
 interface Section {
   Id: number;
@@ -29,12 +26,78 @@ interface Section {
   PageKey: string;
 }
 
+interface SectionContentItem {
+  title?: string;
+  body?: string;
+  icon?: string;
+  src?: string;
+  id?: string;
+  containerId?: string;
+  botId?: string;
+}
+
 const ICON_OPTIONS = [
   'Code', 'Cpu', 'Globe', 'Zap', 'Users', 'Star', 'Award', 'BookOpen', 
   'Briefcase', 'Shield', 'Activity', 'TrendingUp', 'Lightbulb', 
   'MessageSquare', 'Monitor', 'Smartphone', 'LayoutGrid', 'Terminal', 
   'Layers', 'Settings', 'Rocket', 'Heart', 'Flame', 'CheckCircle2'
 ];
+
+function SectionPreview({ contentJson, layoutType }: { contentJson: string; layoutType: string }) {
+  let items: SectionContentItem[] = [];
+  try {
+    const parsed: unknown = JSON.parse(contentJson || '[]');
+    items = Array.isArray(parsed) ? parsed as SectionContentItem[] : [parsed as SectionContentItem];
+  } catch {
+    items = [];
+  }
+
+  if (layoutType === 'script-embed') {
+    return (
+      <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-center text-slate-400 text-xs">
+        <div className="font-bold text-sm text-white mb-2">Script Embed</div>
+        <div className="text-[11px]">{items[0]?.src ? <span className="text-green-400">{items[0].src}</span> : <span className="text-slate-500 italic">Chưa cấu hình src</span>}</div>
+      </div>
+    );
+  }
+
+  if (layoutType === 'timeline') {
+    return (
+      <div className="grid grid-cols-1 gap-3">
+        {items.slice(0, 3).map((item, index) => (
+          <div key={index} className="flex items-start gap-3 p-3 bg-white/5 border border-white/5 rounded-lg">
+            <div className="w-8 h-8 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue">
+              <DynamicIcon name={item.icon} size={14} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-bold text-white line-clamp-1">{item.title || 'Tiêu đề'}</div>
+              <div className="text-xs text-slate-400 line-clamp-2">{item.body || ''}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {items.slice(0, 4).map((item, index) => (
+        <div key={index} className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-start gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue shrink-0">
+            <DynamicIcon name={item.icon} size={16} />
+          </div>
+          <div className="min-w-0">
+            <div className="text-sm font-bold text-white line-clamp-1">{item.title || 'Tiêu đề'}</div>
+            <div className="text-xs text-slate-400 line-clamp-2">{item.body || ''}</div>
+          </div>
+        </div>
+      ))}
+      {items.length === 0 && (
+        <div className="p-4 bg-white/5 border border-white/5 rounded-2xl text-slate-500 text-sm">Chưa có nội dung</div>
+      )}
+    </div>
+  );
+}
 
 export default function SectionsManager() {
   const [sections, setSections] = useState<Section[]>([]);
@@ -56,10 +119,10 @@ export default function SectionsManager() {
   });
 
   const [editorMode, setEditorMode] = useState<'visual' | 'raw'>('visual');
-  const [contentItems, setContentItems] = useState<any[]>([]);
+  const [contentItems, setContentItems] = useState<SectionContentItem[]>([]);
 
   // Helpers for visual editor
-  const syncJson = (items: any[]) => {
+  const syncJson = (items: SectionContentItem[]) => {
     setFormData(prev => ({ ...prev, ContentJson: JSON.stringify(items) }));
   };
 
@@ -91,7 +154,6 @@ export default function SectionsManager() {
   };
 
   const fetchSections = async (page: string) => {
-    setLoading(true);
     const res = await fetch(`/api/admin/sections?pageKey=${page}`);
     if (res.ok) {
       const data = await res.json();
@@ -101,7 +163,20 @@ export default function SectionsManager() {
   };
 
   useEffect(() => {
-    fetchSections(activePage);
+    let cancelled = false;
+
+    fetch(`/api/admin/sections?pageKey=${activePage}`)
+      .then(async (res) => res.ok ? res.json() as Promise<Section[]> : [])
+      .then((data) => {
+        if (!cancelled) setSections(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activePage]);
 
   const handleEdit = (section: Section) => {
@@ -110,7 +185,7 @@ export default function SectionsManager() {
     try {
         const items = JSON.parse(section.ContentJson || '[]');
         setContentItems(Array.isArray(items) ? items : []);
-    } catch (e) {
+    } catch {
         setContentItems([]);
     }
     setEditorMode('visual');
@@ -147,7 +222,7 @@ export default function SectionsManager() {
     // Validate JSON
     try {
         JSON.parse(formData.ContentJson || '[]');
-    } catch (err) {
+    } catch {
         alert('Định dạng JSON không hợp lệ!');
         return;
     }
@@ -164,68 +239,6 @@ export default function SectionsManager() {
       fetchSections(activePage);
     }
   };
-
-  const IconComponent = ({ name, size = 20, className }: any) => {
-    const Icon = (LucideIcons as any)[name];
-    return Icon ? <Icon size={size} className={className} /> : <LucideIcons.HelpCircle size={size} className={className} />;
-  };
-
-   function SectionPreview({ contentJson, layoutType, bgStyle }: { contentJson: string; layoutType: string; bgStyle: string }) {
-      let items: any[] = [];
-      try {
-         const parsed = JSON.parse(contentJson || '[]');
-         items = Array.isArray(parsed) ? parsed : [parsed];
-      } catch (e) {
-         items = [];
-      }
-
-      if (layoutType === 'script-embed') {
-         return (
-            <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-center text-slate-400 text-xs">
-               <div className="font-bold text-sm text-white mb-2">Script Embed</div>
-               <div className="text-[11px]">{items[0]?.src ? <span className="text-green-400">{items[0].src}</span> : <span className="text-slate-500 italic">Chưa cấu hình src</span>}</div>
-            </div>
-         );
-      }
-
-      if (layoutType === 'timeline') {
-         return (
-            <div className="grid grid-cols-1 gap-3">
-               {items.slice(0, 3).map((it, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 bg-white/5 border border-white/5 rounded-lg">
-                     <div className="w-8 h-8 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue">
-                        <IconComponent name={it.icon || 'HelpCircle'} size={14} />
-                     </div>
-                     <div className="flex-1">
-                        <div className="text-sm font-bold text-white line-clamp-1">{it.title || 'Tiêu đề'}</div>
-                        <div className="text-xs text-slate-400 line-clamp-2">{it.body || ''}</div>
-                     </div>
-                  </div>
-               ))}
-            </div>
-         );
-      }
-
-      // Default: grid preview
-      return (
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {items.slice(0, 4).map((it, i) => (
-               <div key={i} className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue">
-                     <IconComponent name={it.icon || 'HelpCircle'} size={16} />
-                  </div>
-                  <div>
-                     <div className="text-sm font-bold text-white line-clamp-1">{it.title || 'Tiêu đề'}</div>
-                     <div className="text-xs text-slate-400 line-clamp-2">{it.body || ''}</div>
-                  </div>
-               </div>
-            ))}
-            {items.length === 0 && (
-               <div className="p-4 bg-white/5 border border-white/5 rounded-2xl text-slate-500 text-sm">Chưa có nội dung</div>
-            )}
-         </div>
-      );
-   }
 
   return (
     <div className="space-y-8 pb-32">
@@ -292,13 +305,13 @@ export default function SectionsManager() {
                    </div>
                 </div>
                 <div className="flex gap-2">
-                   <button onClick={() => handleEdit(s)} className="p-3 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white"><Edit2 size={18} /></button>
-                   <button onClick={() => handleDelete(s.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-slate-400 hover:text-red-500"><Trash2 size={18} /></button>
+                    <button aria-label={`Sửa khung ${s.Title}`} onClick={() => handleEdit(s)} className="p-3 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white"><Edit2 size={18} /></button>
+                    <button aria-label={`Xóa khung ${s.Title}`} onClick={() => handleDelete(s.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-red-300 hover:text-red-400"><Trash2 size={18} /></button>
                 </div>
              </div>
 
              <div className="flex-1">
-                <SectionPreview contentJson={s.ContentJson} layoutType={s.LayoutType} bgStyle={s.BgStyle} />
+                <SectionPreview contentJson={s.ContentJson} layoutType={s.LayoutType} />
              </div>
 
              <div className="flex items-center justify-between mt-auto pt-6 border-t border-white/10">
@@ -317,7 +330,10 @@ export default function SectionsManager() {
       <AnimatePresence>
         {isModalOpen && (
           <>
-            <motion.div 
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="section-form-title"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
               className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[2000]"
@@ -329,17 +345,17 @@ export default function SectionsManager() {
               className="fixed inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-full md:max-w-4xl max-h-[90vh] bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[2001] flex flex-col overflow-hidden"
             >
                <div className="p-8 border-b border-white/10 flex justify-between items-center bg-white/5">
-                  <h2 className="text-2xl font-black text-white">{editingSection ? 'Sửa khung động' : 'Tạo khung mới'}</h2>
-                  <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full text-slate-400"><X size={24} /></button>
+                  <h2 id="section-form-title" className="text-2xl font-black text-white">{editingSection ? 'Sửa khung động' : 'Tạo khung mới'}</h2>
+                  <button aria-label="Đóng biểu mẫu khung động" onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full text-slate-400"><X size={24} /></button>
                </div>
 
                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-10 space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* Page Selection */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thuộc trang</label>
+                        <label htmlFor="section-page" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thuộc trang</label>
                         <select 
-                          value={formData.PageKey} onChange={e => setFormData({...formData, PageKey: e.target.value})}
+                          id="section-page" value={formData.PageKey} onChange={e => setFormData({...formData, PageKey: e.target.value})}
                           className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         >
                           <option value="home">Trang chủ</option>
@@ -350,9 +366,9 @@ export default function SectionsManager() {
 
                       {/* Layout Type */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Bố cục cột</label>
+                        <label htmlFor="section-layout" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Bố cục cột</label>
                         <select 
-                          value={formData.LayoutType} onChange={e => setFormData({...formData, LayoutType: e.target.value})}
+                          id="section-layout" value={formData.LayoutType} onChange={e => setFormData({...formData, LayoutType: e.target.value})}
                           className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         >
                           <option value="1-col">1 Cột (Full width)</option>
@@ -367,9 +383,9 @@ export default function SectionsManager() {
 
                       {/* Title */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tiêu đề (Hỗ trợ HTML)</label>
+                        <label htmlFor="section-title" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tiêu đề (Hỗ trợ HTML)</label>
                         <input 
-                          type="text" required
+                          id="section-title" type="text" required
                           value={formData.Title} onChange={e => setFormData({...formData, Title: e.target.value})}
                           className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         />
@@ -377,9 +393,9 @@ export default function SectionsManager() {
 
                       {/* Subtitle */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phụ đề</label>
+                        <label htmlFor="section-subtitle" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phụ đề</label>
                         <input 
-                          type="text"
+                          id="section-subtitle" type="text"
                           value={formData.Subtitle} onChange={e => setFormData({...formData, Subtitle: e.target.value})}
                           className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         />
@@ -387,9 +403,9 @@ export default function SectionsManager() {
 
                       {/* Background Style */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phong cách nền</label>
+                        <label htmlFor="section-background" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Phong cách nền</label>
                         <select 
-                          value={formData.BgStyle} onChange={e => setFormData({...formData, BgStyle: e.target.value})}
+                          id="section-background" value={formData.BgStyle} onChange={e => setFormData({...formData, BgStyle: e.target.value})}
                           className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         >
                           <option value="default">Trong suốt (Mặc định)</option>
@@ -400,9 +416,9 @@ export default function SectionsManager() {
 
                       {/* Order */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự hiển thị (Nhỏ đứng trước)</label>
+                        <label htmlFor="section-order" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự hiển thị (Nhỏ đứng trước)</label>
                         <input 
-                          type="number" required
+                          id="section-order" type="number" required
                           value={formData.OrderIndex} onChange={e => setFormData({...formData, OrderIndex: parseInt(e.target.value)})}
                           className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         />
@@ -410,10 +426,10 @@ export default function SectionsManager() {
 
                       {/* Active Toggle */}
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Trạng thái hiển thị</label>
+                        <label htmlFor="section-active" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Trạng thái hiển thị</label>
                         <div className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-2xl">
                            <input 
-                              type="checkbox" 
+                              id="section-active" type="checkbox"
                               checked={formData.IsActive} 
                               onChange={e => setFormData({...formData, IsActive: e.target.checked})}
                               className="w-6 h-6 rounded-lg accent-lhu-blue"
@@ -427,22 +443,24 @@ export default function SectionsManager() {
                   <div className="space-y-6">
                     <div className="flex justify-between items-center px-2">
                        <div className="flex items-center gap-3">
-                          <label className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">Thành phần nội dung</label>
+                          <p className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none">Thành phần nội dung</p>
                        </div>
                        <div className="flex gap-2 bg-white/5 p-1 rounded-xl border border-white/10">
                           <button 
-                            type="button"
+                             type="button"
+                             aria-pressed={editorMode === 'visual'}
                             onClick={() => {
                                try {
                                    const items = JSON.parse(formData.ContentJson || '[]');
                                    if (Array.isArray(items)) setContentItems(items);
-                               } catch (e) {}
+                               } catch {}
                                setEditorMode('visual');
                             }}
                             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${editorMode === 'visual' ? 'bg-lhu-blue text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                           >Trực quan</button>
                           <button 
-                            type="button"
+                             type="button"
+                             aria-pressed={editorMode === 'raw'}
                             onClick={() => setEditorMode('raw')}
                             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${editorMode === 'raw' ? 'bg-slate-700 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
                           >Mã JSON</button>
@@ -462,9 +480,9 @@ export default function SectionsManager() {
                                 <div className="space-y-6 bg-white/5 border border-white/10 p-8 rounded-3xl">
                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                       <div className="space-y-2">
-                                         <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">Đường dẫn Script (Src)</label>
+                                         <label htmlFor="section-script-src" className="text-[10px] font-bold text-slate-600 uppercase ml-1">Đường dẫn Script (Src)</label>
                                          <input 
-                                            type="text" 
+                                            id="section-script-src" type="url"
                                             value={contentItems[0]?.src || ''}
                                             onChange={(e) => {
                                                const newItems = [{ ...contentItems[0], src: e.target.value }];
@@ -476,9 +494,9 @@ export default function SectionsManager() {
                                          />
                                       </div>
                                       <div className="space-y-2">
-                                         <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID thẻ Script</label>
+                                         <label htmlFor="section-script-id" className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID thẻ Script</label>
                                          <input 
-                                            type="text" 
+                                            id="section-script-id" type="text"
                                             value={contentItems[0]?.id || ''}
                                             onChange={(e) => {
                                                const newItems = [{ ...contentItems[0], id: e.target.value }];
@@ -489,9 +507,9 @@ export default function SectionsManager() {
                                          />
                                       </div>
                                       <div className="space-y-2">
-                                         <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID Vùng chứa (Container ID)</label>
+                                         <label htmlFor="section-container-id" className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID Vùng chứa (Container ID)</label>
                                          <input 
-                                            type="text" 
+                                            id="section-container-id" type="text"
                                             value={contentItems[0]?.containerId || ''}
                                             onChange={(e) => {
                                                const newItems = [{ ...contentItems[0], containerId: e.target.value }];
@@ -502,9 +520,9 @@ export default function SectionsManager() {
                                          />
                                       </div>
                                       <div className="space-y-2">
-                                         <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID Bot / Token</label>
+                                         <label htmlFor="section-bot-id" className="text-[10px] font-bold text-slate-600 uppercase ml-1">ID Bot / Token</label>
                                          <input 
-                                            type="text" 
+                                            id="section-bot-id" type="text"
                                             value={contentItems[0]?.botId || ''}
                                             onChange={(e) => {
                                                const newItems = [{ ...contentItems[0], botId: e.target.value }];
@@ -526,9 +544,9 @@ export default function SectionsManager() {
                                       >
                                          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
                                             <div className="md:col-span-2 space-y-2">
-                                               <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">Icon</label>
+                                               <label htmlFor={`section-item-icon-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Icon</label>
                                                <select 
-                                                  value={item.icon || ''}
+                                                  id={`section-item-icon-${index}`} value={item.icon || ''}
                                                   onChange={(e) => updateItem(index, 'icon', e.target.value)}
                                                   className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue transition-all"
                                                >
@@ -539,18 +557,18 @@ export default function SectionsManager() {
                                                </select>
                                             </div>
                                             <div className="md:col-span-4 space-y-2">
-                                               <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">Tiêu đề</label>
+                                               <label htmlFor={`section-item-title-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Tiêu đề</label>
                                                <input 
-                                                  type="text" 
+                                                  id={`section-item-title-${index}`} type="text"
                                                   value={item.title || ''}
                                                   onChange={(e) => updateItem(index, 'title', e.target.value)}
                                                   className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue"
                                                />
                                             </div>
                                             <div className="md:col-span-5 space-y-2">
-                                               <label className="text-[10px] font-bold text-slate-600 uppercase ml-1">Nội dung chi tiết</label>
+                                               <label htmlFor={`section-item-body-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Nội dung chi tiết</label>
                                                <textarea 
-                                                  rows={2}
+                                                  id={`section-item-body-${index}`} rows={2}
                                                   value={item.body || ''}
                                                   onChange={(e) => updateItem(index, 'body', e.target.value)}
                                                   className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue resize-none"
@@ -559,17 +577,18 @@ export default function SectionsManager() {
                                             <div className="md:col-span-1 pt-6 flex justify-end">
                                                <button 
                                                   type="button"
+                                                  aria-label={`Xóa thành phần ${index + 1}`}
                                                   onClick={() => removeItem(index)}
-                                                  className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
+                                                  className="p-2 text-red-300 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
                                                >
                                                   <Trash2 size={18} />
                                                </button>
                                             </div>
                                          </div>
 
-                                         <div className="absolute -left-3 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <button type="button" onClick={() => moveItem(index, -1)} className="p-1 bg-slate-800 border border-white/10 rounded-md text-slate-400 hover:text-white"><ChevronUp size={14} /></button>
-                                            <button type="button" onClick={() => moveItem(index, 1)} className="p-1 bg-slate-800 border border-white/10 rounded-md text-slate-400 hover:text-white"><ChevronDown size={14} /></button>
+                                         <div className="absolute -left-3 top-1/2 -translate-y-1/2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
+                                            <button type="button" disabled={index === 0} aria-label={`Đưa thành phần ${index + 1} lên`} onClick={() => moveItem(index, -1)} className="p-1 bg-slate-800 border border-white/10 rounded-md text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"><ChevronUp size={14} /></button>
+                                            <button type="button" disabled={index === contentItems.length - 1} aria-label={`Đưa thành phần ${index + 1} xuống`} onClick={() => moveItem(index, 1)} className="p-1 bg-slate-800 border border-white/10 rounded-md text-slate-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"><ChevronDown size={14} /></button>
                                          </div>
                                       </motion.div>
                                    ))}
@@ -592,7 +611,9 @@ export default function SectionsManager() {
                             exit={{ opacity: 0, x: -20 }}
                             className="space-y-4"
                           >
+                             <label htmlFor="section-content-json" className="sr-only">Mã JSON nội dung</label>
                              <textarea 
+                                id="section-content-json"
                                 rows={10} required
                                 value={formData.ContentJson} 
                                 onChange={e => setFormData({...formData, ContentJson: e.target.value})}

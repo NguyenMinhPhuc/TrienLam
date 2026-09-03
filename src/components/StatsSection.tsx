@@ -1,21 +1,9 @@
 "use client";
 import { motion } from 'framer-motion';
-import * as LucideIcons from 'lucide-react';
+import DynamicIcon from './DynamicIcon';
+import type { StatData } from '@/lib/types';
 
-interface Stat {
-  Id: number;
-  Label: string;
-  Value: string;
-  IconName: string;
-}
-
-export default function StatsSection({ stats }: { stats: Stat[] }) {
-  // Helper to render icon by name
-  const IconComponent = ({ name, className }: { name: string, className?: string }) => {
-    const Icon = (LucideIcons as any)[name];
-    return Icon ? <Icon className={className} size={32} /> : <LucideIcons.HelpCircle className={className} size={32} />;
-  };
-
+export default function StatsSection({ stats }: { stats: StatData[] }) {
   return (
     <section className="py-24 bg-background relative overflow-hidden transition-colors duration-500">
       <div className="container mx-auto px-4">
@@ -30,7 +18,7 @@ export default function StatsSection({ stats }: { stats: Stat[] }) {
               className="text-center"
             >
               <div className="w-16 h-16 bg-card-bg rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-card-border">
-                <IconComponent name={stat.IconName} className="text-lhu-blue dark:text-lhu-blue" />
+                <DynamicIcon name={stat.IconName} size={32} className="text-lhu-blue dark:text-lhu-blue" />
               </div>
               <h3 className="text-4xl font-black mb-2 text-foreground">{stat.Value}</h3>
               <p className="text-muted font-bold uppercase tracking-widest text-xs">{stat.Label}</p>

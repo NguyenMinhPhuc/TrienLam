@@ -37,6 +37,9 @@ export default function Navbar() {
           <button 
             className="p-2 text-lhu-orange"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? 'Đóng trình đơn' : 'Mở trình đơn'}
+            aria-expanded={isOpen}
+            aria-controls="mobile-navigation"
           >
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -52,7 +55,7 @@ export default function Navbar() {
             exit={{ opacity: 0, height: 0 }}
             className="md:hidden bg-background border-b border-card-border overflow-hidden"
           >
-            <nav className="flex flex-col p-6 gap-6 font-bold text-center">
+            <nav id="mobile-navigation" aria-label="Điều hướng trên thiết bị di động" className="flex flex-col p-6 gap-6 font-bold text-center">
               <Link href="/#faculty" onClick={() => setIsOpen(false)} className="hover:text-lhu-orange transition-colors">Khoa CNTT</Link>
               <Link href="/academic" onClick={() => setIsOpen(false)} className="hover:text-lhu-orange transition-colors">Ngành đào tạo</Link>
               <Link href="/#products" onClick={() => setIsOpen(false)} className="hover:text-lhu-orange transition-colors">Sản phẩm</Link>

@@ -4,20 +4,21 @@ import { motion } from 'framer-motion';
 import { 
   Package, 
   Layers, 
-  Users, 
   ArrowUpRight, 
-  Calendar, 
   CheckCircle2, 
   Clock, 
   ExternalLink 
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import CmsImage from '@/components/CmsImage';
+import type { Product } from '@/components/ProductCard';
 
 interface DashboardStats {
   totalProducts: number;
   totalSections: number;
   totalStats: number;
-  recentProducts: any[];
+  recentProducts: Product[];
 }
 
 export default function AdminDashboard() {
@@ -32,7 +33,7 @@ export default function AdminDashboard() {
           const stats = await res.json();
           setData(stats);
         }
-      } catch (err) {
+      } catch {
         console.error('Failed to fetch dashboard stats');
       } finally {
         setLoading(false);
@@ -124,8 +125,8 @@ export default function AdminDashboard() {
                 <tr key={p.Id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-slate-800 overflow-hidden flex-shrink-0 border border-white/10">
-                         <img src={p.ImageUrl} alt="" className="w-full h-full object-cover" />
+                       <div className="relative w-12 h-12 rounded-xl bg-slate-800 overflow-hidden flex-shrink-0 border border-white/10">
+                          <CmsImage src={p.ImageUrl} alt={`Ảnh dự án ${p.Name}`} sizes="48px" className="object-cover" />
                       </div>
                       <span className="font-bold text-lg text-white group-hover:text-lhu-orange transition-colors">{p.Name}</span>
                     </div>
@@ -140,7 +141,7 @@ export default function AdminDashboard() {
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <a href={p.AppUrl} target="_blank" className="p-2 hover:bg-white/10 rounded-lg inline-flex text-slate-400 hover:text-white transition-all">
+                    <a aria-label={`Mở dự án ${p.Name}`} href={p.AppUrl} target="_blank" rel="noreferrer" className="p-2 hover:bg-white/10 rounded-lg inline-flex text-slate-400 hover:text-white transition-all">
                        <ExternalLink size={20} />
                     </a>
                   </td>
@@ -154,7 +155,15 @@ export default function AdminDashboard() {
   );
 }
 
-function StatCard({ label, value, icon: Icon, color, link }: any) {
+interface StatCardProps {
+  label: string;
+  value: number;
+  icon: LucideIcon;
+  color: string;
+  link: string;
+}
+
+function StatCard({ label, value, icon: Icon, color, link }: StatCardProps) {
   return (
     <Link href={link} className="bg-white/5 border border-white/10 p-8 rounded-[20px] group hover:bg-white/10 transition-all shadow-lg hover:shadow-2xl">
       <div className="flex justify-between items-start mb-6">

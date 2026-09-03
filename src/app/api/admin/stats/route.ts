@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query, execute } from '@/lib/db';
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const result = await query('SELECT * FROM Stats ORDER BY OrderIndex ASC');
     return NextResponse.json(result.recordset);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
   }
 }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ message: 'Stat created successfully' });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Insert failed' }, { status: 500 });
   }
 }
@@ -37,7 +37,7 @@ export async function PUT(req: NextRequest) {
     );
 
     return NextResponse.json({ message: 'Stat updated successfully' });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
 }
@@ -51,7 +51,7 @@ export async function DELETE(req: NextRequest) {
 
     await execute('DELETE FROM Stats WHERE Id = @id', { id: parseInt(id) });
     return NextResponse.json({ message: 'Stat deleted successfully' });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   }
 }

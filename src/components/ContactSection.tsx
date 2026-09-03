@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Send, Share2, Globe, Info } from 'lucide-react';
+import { MapPin, Phone, Mail, Send } from 'lucide-react';
 
 interface ContactSectionProps {
   address?: string;
@@ -40,7 +39,7 @@ export default function ContactSection({ address, phone, email }: ContactSection
         const data = await res.json();
         setError(data.error || 'Đã có lỗi xảy ra.');
       }
-    } catch (err) {
+    } catch {
       setError('Lỗi kết nối. Vui lòng thử lại sau.');
     } finally {
       setIsSending(false);
@@ -92,11 +91,6 @@ export default function ContactSection({ address, phone, email }: ContactSection
               </div>
             </div>
 
-            <div className="flex gap-4 mt-16">
-              <a href="#" className="w-12 h-12 rounded-full border border-card-border flex items-center justify-center hover:bg-lhu-blue/10 dark:hover:bg-lhu-blue/20 transition-all text-foreground"><Share2 size={20} /></a>
-              <a href="#" className="w-12 h-12 rounded-full border border-card-border flex items-center justify-center hover:bg-lhu-orange/10 dark:hover:bg-lhu-orange/20 transition-all text-foreground"><Globe size={20} /></a>
-              <a href="#" className="w-12 h-12 rounded-full border border-card-border flex items-center justify-center hover:bg-red-500/10 dark:hover:bg-red-500/20 transition-all text-foreground"><Info size={20} /></a>
-            </div>
           </div>
 
           {/* Form Side */}
@@ -105,9 +99,12 @@ export default function ContactSection({ address, phone, email }: ContactSection
                <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                      <div className="space-y-3">
-                        <label className="text-sm font-bold text-muted ml-2 uppercase">Họ và tên</label>
+                        <label htmlFor="contact-full-name" className="text-sm font-bold text-muted ml-2 uppercase">Họ và tên</label>
                         <input 
+                           id="contact-full-name"
+                           name="fullName"
                            type="text" 
+                           autoComplete="name"
                            required
                            value={formData.fullName}
                            onChange={e => setFormData({...formData, fullName: e.target.value})}
@@ -116,9 +113,12 @@ export default function ContactSection({ address, phone, email }: ContactSection
                         />
                      </div>
                      <div className="space-y-3">
-                        <label className="text-sm font-bold text-muted ml-2 uppercase">Email liên hệ</label>
+                        <label htmlFor="contact-email" className="text-sm font-bold text-muted ml-2 uppercase">Email liên hệ</label>
                         <input 
+                           id="contact-email"
+                           name="email"
                            type="email" 
+                           autoComplete="email"
                            required
                            value={formData.email}
                            onChange={e => setFormData({...formData, email: e.target.value})}
@@ -129,9 +129,12 @@ export default function ContactSection({ address, phone, email }: ContactSection
                   </div>
 
                   <div className="space-y-3">
-                      <label className="text-sm font-bold text-muted ml-2 uppercase">Số điện thoại</label>
+                      <label htmlFor="contact-phone" className="text-sm font-bold text-muted ml-2 uppercase">Số điện thoại</label>
                       <input 
+                        id="contact-phone"
+                        name="phone"
                         type="tel" 
+                        autoComplete="tel"
                         value={formData.phone}
                         onChange={e => setFormData({...formData, phone: e.target.value})}
                         className="w-full p-5 bg-background border border-card-border rounded-2xl focus:border-lhu-blue outline-none transition-all text-foreground" 
@@ -140,8 +143,10 @@ export default function ContactSection({ address, phone, email }: ContactSection
                   </div>
                   
                   <div className="space-y-3">
-                      <label className="text-sm font-bold text-muted ml-2 uppercase">Bạn quan tâm điều gì?</label>
+                      <label htmlFor="contact-message" className="text-sm font-bold text-muted ml-2 uppercase">Bạn quan tâm điều gì?</label>
                       <textarea 
+                        id="contact-message"
+                        name="message"
                         rows={4}
                         required
                         value={formData.message}
@@ -151,11 +156,13 @@ export default function ContactSection({ address, phone, email }: ContactSection
                       />
                   </div>
 
-                  {error && <p className="text-red-500 text-sm font-bold ml-2">{error}</p>}
+                  {error && <p role="alert" className="text-red-500 text-sm font-bold ml-2">{error}</p>}
+                  {isSent && <p role="status" className="sr-only">Tin nhắn đã được gửi thành công.</p>}
 
                   <button 
+                    type="submit"
                     disabled={isSending || isSent}
-                    className={`w-full py-6 rounded-2xl font-bold text-xl flex items-center justify-center gap-4 transition-all ${isSent ? 'bg-green-600 shadow-lg shadow-green-600/30 text-white' : isSending ? 'bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-lhu-blue text-white hover:scale-[1.01] hover:shadow-2xl shadow-lhu-blue/30'}`}
+                    className={`w-full py-6 rounded-2xl font-bold text-xl flex items-center justify-center gap-4 transition-all ${isSent ? 'bg-green-600 shadow-lg shadow-green-600/30 text-white' : isSending ? 'bg-slate-700 text-white/80 cursor-not-allowed' : 'bg-lhu-blue text-white hover:scale-[1.01] hover:shadow-2xl shadow-lhu-blue/30'}`}
                   >
                     {isSent ? 'Đã gửi thành công!' : isSending ? 'Đang gửi...' : <><Send size={24} /> Gửi tin nhắn</>}
                   </button>

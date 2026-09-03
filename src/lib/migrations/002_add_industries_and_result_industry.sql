@@ -24,3 +24,10 @@ BEGIN
     ('Frontend', N'Frontend Development', N'Giao diện người dùng và trải nghiệm người dùng'),
     ('Backend', N'Backend / Systems', N'Hệ thống, server và kiến trúc phần mềm');
 END
+
+-- Map existing quiz results to their matching industry keys.
+UPDATE qr
+SET qr.IndustryKey = qr.ResultKey
+FROM QuizResults qr
+INNER JOIN Industries i ON i.IndustryKey = qr.ResultKey
+WHERE qr.IndustryKey IS NULL OR LTRIM(RTRIM(qr.IndustryKey)) = '';

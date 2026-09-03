@@ -1,4 +1,4 @@
-const { execute, query } = require('./db');
+import { closeDatabase, execute } from './db.mjs';
 
 async function init() {
   try {
@@ -90,8 +90,8 @@ async function init() {
   } catch (err) {
     console.error('Initialization failed:', err);
   } finally {
-    process.exit(0);
+    await closeDatabase();
   }
 }
 
-init();
+await init();

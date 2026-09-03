@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, execute } from '@/lib/db';
+import { execute } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
     const pageKey = searchParams.get('pageKey') || 'home';
     const result = await execute('SELECT * FROM CustomSections WHERE PageKey = @pageKey ORDER BY OrderIndex ASC', { pageKey });
     return NextResponse.json(result.recordset);
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: 'Fetch failed' }, { status: 500 });
   }
 }

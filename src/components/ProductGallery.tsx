@@ -26,11 +26,13 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
   return (
     <div className="space-y-16">
       {/* Tabs Control */}
-      <div className="flex flex-wrap justify-center gap-4">
+      <div aria-label="Lọc sản phẩm theo lĩnh vực" className="flex flex-wrap justify-center gap-4">
         {categories.map((cat) => (
           <button
+            type="button"
             key={cat.id}
             onClick={() => setActiveTab(cat.id)}
+            aria-pressed={activeTab === cat.id}
             className={`
               flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all relative
               ${activeTab === cat.id 
@@ -52,7 +54,8 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
       </div>
 
       {/* Products Grid */}
-      <motion.div 
+      <motion.div
+        aria-live="polite"
         layout
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
       >

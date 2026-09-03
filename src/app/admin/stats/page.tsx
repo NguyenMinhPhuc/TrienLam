@@ -1,19 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  BarChart3, 
-  Plus, 
-  Edit2, 
-  Trash2, 
-  X, 
-  Settings2,
-  Trophy,
-  Users,
-  Rocket,
-  Globe
-} from 'lucide-react';
-import * as LucideIcons from 'lucide-react';
+import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 
 interface Stat {
   Id: number;
@@ -44,7 +33,6 @@ export default function StatsManager() {
   });
 
   const fetchStats = async () => {
-    setLoading(true);
     const res = await fetch('/api/admin/stats');
     if (res.ok) {
         const data = await res.json();
@@ -54,7 +42,20 @@ export default function StatsManager() {
   };
 
   useEffect(() => {
-    fetchStats();
+    let cancelled = false;
+
+    fetch('/api/admin/stats')
+      .then(async (res) => res.ok ? res.json() as Promise<Stat[]> : [])
+      .then((data) => {
+        if (!cancelled) setStats(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleEdit = (stat: Stat) => {
@@ -86,11 +87,6 @@ export default function StatsManager() {
     }
   };
 
-  const IconComponent = ({ name, size = 20, className }: any) => {
-    const Icon = (LucideIcons as any)[name];
-    return Icon ? <Icon size={size} className={className} /> : <LucideIcons.HelpCircle size={size} className={className} />;
-  };
-
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -118,14 +114,14 @@ export default function StatsManager() {
             className="bg-white/5 border border-white/10 p-8 rounded-[24px] group hover:border-lhu-orange/50 transition-all flex flex-col items-center text-center"
           >
              <div className="w-20 h-20 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10 group-hover:bg-lhu-orange/10 group-hover:text-lhu-orange group-hover:border-lhu-orange/20 transition-all text-lhu-blue">
-                <IconComponent name={stat.IconName} size={40} />
+                <DynamicIcon name={stat.IconName} size={40} />
              </div>
              <h3 className="text-4xl font-black text-white mb-2">{stat.Value}</h3>
              <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px] mb-6">{stat.Label}</p>
              
              <div className="w-full pt-6 border-t border-white/10 flex justify-center gap-4">
-                <button onClick={() => handleEdit(stat)} className="p-3 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all"><Edit2 size={18} /></button>
-                <button onClick={() => handleDelete(stat.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-slate-400 hover:text-red-500 transition-all"><Trash2 size={18} /></button>
+                <button aria-label={`Sửa chỉ số ${stat.Label}`} onClick={() => handleEdit(stat)} className="p-3 hover:bg-white/10 rounded-xl text-slate-400 hover:text-white transition-all"><Edit2 size={18} /></button>
+                <button aria-label={`Xóa chỉ số ${stat.Label}`} onClick={() => handleDelete(stat.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-red-300 hover:text-red-400 transition-all"><Trash2 size={18} /></button>
              </div>
           </motion.div>
         ))}
@@ -140,18 +136,29 @@ export default function StatsManager() {
               onClick={() => setIsModalOpen(false)}
               className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[2000]"
             />
-            <motion.div 
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="stat-modal-title"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-lg bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[2001] p-10"
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100%_-_2rem)] max-w-lg max-h-[90vh] overflow-y-auto bg-slate-900 border border-white/10 rounded-[32px] shadow-2xl z-[2001] p-6 md:p-10"
             >
-               <h2 className="text-3xl font-black text-white mb-8">{editingStat ? 'Sửa chỉ số' : 'Thêm chỉ số'}</h2>
+               <button
+                 type="button"
+                 aria-label="Đóng hộp thoại"
+                 onClick={() => setIsModalOpen(false)}
+                 className="absolute right-5 top-5 rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lhu-blue"
+               >
+                 <X size={20} />
+               </button>
+               <h2 id="stat-modal-title" className="text-3xl font-black text-white mb-8 pr-10">{editingStat ? 'Sửa chỉ số' : 'Thêm chỉ số'}</h2>
                <form onSubmit={handleSubmit} className="space-y-6">
                   <div className="space-y-2">
-                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tên chỉ số</label>
+                     <label htmlFor="stat-label" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tên chỉ số</label>
                      <input 
-                        type="text" required
+                        id="stat-label" type="text" required
                         value={formData.Label} onChange={e => setFormData({...formData, Label: e.target.value})}
                         className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         placeholder="Dự án sinh viên"
@@ -159,9 +166,9 @@ export default function StatsManager() {
                   </div>
                   
                   <div className="space-y-2">
-                     <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Giá trị (Số liệu)</label>
+                     <label htmlFor="stat-value" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Giá trị (Số liệu)</label>
                      <input 
-                        type="text" required
+                        id="stat-value" type="text" required
                         value={formData.Value} onChange={e => setFormData({...formData, Value: e.target.value})}
                         className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         placeholder="150+"
@@ -170,9 +177,9 @@ export default function StatsManager() {
 
                   <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Icon (Tên Lucide)</label>
+                        <label htmlFor="stat-icon" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Icon (Tên Lucide)</label>
                         <select 
-                            required
+                            id="stat-icon" required
                             value={formData.IconName} onChange={e => setFormData({...formData, IconName: e.target.value})}
                             className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         >
@@ -183,9 +190,9 @@ export default function StatsManager() {
                         </select>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự</label>
+                        <label htmlFor="stat-order" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự</label>
                         <input 
-                            type="number" required
+                            id="stat-order" type="number" required
                             value={formData.OrderIndex} onChange={e => setFormData({...formData, OrderIndex: parseInt(e.target.value)})}
                             className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all"
                         />

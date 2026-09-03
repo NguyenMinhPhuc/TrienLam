@@ -1,9 +1,12 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Code2, User, Calendar, Target } from 'lucide-react';
 import { Product } from './ProductCard';
+import CmsImage from './CmsImage';
+
+const subscribeToClient = () => () => undefined;
 
 interface ProductModalProps {
   product: Product;
@@ -12,15 +15,13 @@ interface ProductModalProps {
 }
 
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const mounted = useSyncExternalStore(subscribeToClient, () => true, () => false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      closeButtonRef.current?.focus();
     } else {
       document.body.style.overflow = '';
     }
@@ -28,6 +29,17 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
       document.body.style.overflow = '';
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!mounted) return null;
 
@@ -47,6 +59,9 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           {/* Modal Container */}
           <div className="fixed inset-0 flex items-center justify-center z-[99999] p-4 pointer-events-none">
             <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={`product-title-${product.Id}`}
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -60,13 +75,12 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   transition={{ delay: 0.2 }}
                   className="w-full h-full relative"
                 >
-                  <img 
-                    src={product.ImageUrl} 
-                    alt={product.Name} 
-                    className="w-full h-full object-contain drop-shadow-2xl"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x800?text=LHU+Tech+Hub';
-                    }}
+                  <CmsImage
+                    src={product.ImageUrl}
+                    alt={`Ảnh dự án ${product.Name}`}
+                    fallbackSrc="/window.svg"
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-contain drop-shadow-2xl"
                   />
                 </motion.div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent md:hidden pointer-events-none" />
@@ -75,7 +89,9 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               {/* Content Section */}
               <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto bg-background">
                 <button 
+                  ref={closeButtonRef}
                   onClick={onClose}
+                  aria-label="Đóng cửa sổ chi tiết dự án"
                   className="absolute top-6 right-6 p-2 bg-card-bg hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-foreground"
                 >
                   <X size={24} />
@@ -90,7 +106,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   </span>
                 </div>
 
-                <h2 className="text-3xl md:text-4xl font-black mb-6 leading-tight text-foreground">{product.Name}</h2>
+                <h2 id={`product-title-${product.Id}`} className="text-3xl md:text-4xl font-black mb-6 leading-tight text-foreground">{product.Name}</h2>
 
                 <div className="space-y-8">
                    {/* Author */}

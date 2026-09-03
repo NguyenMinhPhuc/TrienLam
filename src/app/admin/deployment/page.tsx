@@ -22,7 +22,7 @@ export default function DeploymentManager() {
       } else {
         setStatus({ type: 'error', message: data.error });
       }
-    } catch (err) {
+    } catch {
       setStatus({ type: 'error', message: 'Lỗi kết nối tới máy chủ.' });
     } finally {
       setIsDeploying(false);

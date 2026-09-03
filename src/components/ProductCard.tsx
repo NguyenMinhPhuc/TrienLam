@@ -1,6 +1,7 @@
 "use client";
 import { Monitor, MessageSquare, Globe, Settings } from 'lucide-react';
 import { motion } from 'framer-motion';
+import CmsImage from './CmsImage';
 
 export interface Product {
   Id: number;
@@ -31,19 +32,20 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <>
-      <motion.div 
+      <motion.button
+        type="button"
         whileHover={{ y: -10 }}
         onClick={() => setIsModalOpen(true)}
-        className="bg-card-bg backdrop-blur-xl border border-card-border rounded-[20px] overflow-hidden flex flex-col group transition-all hover:border-lhu-orange/50 cursor-pointer shadow-lg hover:shadow-2xl"
+        className="w-full h-full text-left bg-card-bg backdrop-blur-xl border border-card-border rounded-[20px] overflow-hidden flex flex-col group transition-all hover:border-lhu-orange/50 cursor-pointer shadow-lg hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lhu-orange/50"
+        aria-label={`Xem chi tiết dự án ${product.Name}`}
       >
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center">
-          <img 
-            src={product.ImageUrl} 
-            alt={product.Name} 
-            className="w-full h-full object-cover transition-transform group-hover:scale-105"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x200?text=LHU+Tech+Hub';
-            }}
+          <CmsImage
+            src={product.ImageUrl}
+            alt={`Ảnh dự án ${product.Name}`}
+            fallbackSrc="/window.svg"
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover transition-transform group-hover:scale-105"
           />
           <div className="absolute top-4 right-4 bg-lhu-blue/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white z-10">
             {product.Year}
@@ -67,13 +69,13 @@ export default function ProductCard({ product }: { product: Product }) {
             ))}
           </div>
           
-          <button 
+          <span
             className="w-full py-4 rounded-2xl border border-card-border bg-card-bg text-foreground group-hover:bg-lhu-blue group-hover:text-white group-hover:border-lhu-blue transition-all text-center font-bold"
           >
             Xem chi tiết
-          </button>
+          </span>
         </div>
-      </motion.div>
+      </motion.button>
 
       <ProductModal 
         product={product} 

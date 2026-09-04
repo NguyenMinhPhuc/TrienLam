@@ -1,19 +1,26 @@
 "use client";
-import { motion } from 'framer-motion';
+
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
+import { useState } from 'react';
 import ProductGallery from './ProductGallery';
 import { Product } from './ProductCard';
 import DynamicIcon from './DynamicIcon';
+import CmsImage from './CmsImage';
 
 interface ContentItem {
   title: string;
   body: string;
   icon: string;
-  // For script-embed
   src?: string;
   id?: string;
   containerId?: string;
   botId?: string;
+  image?: string;
+  imageAlt?: string;
+  linkLabel?: string;
+  linkUrl?: string;
 }
 
 interface DynamicSectionProps {
@@ -26,50 +33,95 @@ interface DynamicSectionProps {
   products?: Product[];
 }
 
-export default function DynamicSection({ 
+const ease = [0.22, 1, 0.36, 1] as const;
+
+function ItemMedia({ item, light = false }: { item: ContentItem; light?: boolean }) {
+  const isExternal = item.linkUrl?.startsWith('http');
+
+  if (!item.image && !item.linkUrl) return null;
+
+  return (
+    <div className="mt-6">
+      {item.image && (
+        <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl bg-[#050b12]">
+          <CmsImage
+            src={item.image}
+            alt={item.imageAlt || item.title || 'Ảnh minh họa nội dung'}
+            sizes="(min-width: 1024px) 42vw, 100vw"
+            className="object-cover"
+          />
+        </div>
+      )}
+      {item.linkUrl && (
+        <a
+          href={item.linkUrl}
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noreferrer' : undefined}
+          className={`inline-flex items-center gap-2 text-sm font-semibold underline decoration-lhu-orange/60 underline-offset-4 ${light ? 'text-white' : 'text-foreground'}`}
+        >
+          {item.linkLabel || 'Tìm hiểu thêm'}
+          <ArrowUpRight size={16} aria-hidden="true" />
+        </a>
+      )}
+    </div>
+  );
+}
+
+function SectionIntro({ title, subtitle, light = false }: { title: string; subtitle?: string; light?: boolean }) {
+  return (
+    <div className="mb-14 grid gap-6 md:grid-cols-[1fr_.72fr] md:items-end">
+      <motion.h2
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.62, ease }}
+        className={`section-title ${light ? 'text-white' : 'text-foreground'}`}
+        dangerouslySetInnerHTML={{ __html: title }}
+      />
+      {subtitle && (
+        <motion.p
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-100px' }}
+          transition={{ duration: 0.58, delay: 0.08, ease }}
+          className={`${light ? 'section-copy-on-dark' : 'section-copy'} md:justify-self-end`}
+          dangerouslySetInnerHTML={{ __html: subtitle }}
+        />
+      )}
+    </div>
+  );
+}
+
+export default function DynamicSection({
   anchorId,
-  title, 
-  subtitle, 
-  layoutType, 
-  bgStyle, 
+  title,
+  subtitle,
+  layoutType,
+  bgStyle,
   contentJson,
-  products = []
+  products = [],
 }: DynamicSectionProps) {
+  const [openIndex, setOpenIndex] = useState(0);
   let items: ContentItem[] = [];
+
   try {
     const parsed = JSON.parse(contentJson);
     items = Array.isArray(parsed) ? parsed : [parsed];
-  } catch (e) {
-    console.error("Failed to parse section content JSON", e);
+  } catch (error) {
+    console.error('Failed to parse section content JSON', error);
   }
 
-  const getGridClass = () => {
-    switch (layoutType) {
-      case '1-col': return 'grid-cols-1 max-w-3xl mx-auto';
-      case '2-col': return 'grid-cols-1 md:grid-cols-2 gap-10';
-      case '3-col': return 'grid-cols-1 md:grid-cols-3 gap-8';
-      case '4-col': return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6';
-      default: return 'grid-cols-1 md:grid-cols-3 gap-8';
-    }
-  };
-
-  const getBgClass = () => {
-    switch (bgStyle) {
-      case 'muted': return 'bg-card-bg/30';
-      case 'gradient': return 'bg-gradient-to-b from-lhu-blue/5 to-lhu-orange/5';
-      default: return 'bg-transparent';
-    }
-  };
+  const sectionSurface = bgStyle === 'muted'
+    ? 'bg-[var(--surface-1)] border-y border-card-border'
+    : bgStyle === 'gradient'
+      ? 'blueprint-surface border-y border-card-border'
+      : 'bg-background';
 
   if (layoutType === 'product-showcase') {
     return (
-      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
-            {subtitle && <p className="text-muted text-xl max-w-2xl mx-auto mb-10" dangerouslySetInnerHTML={{ __html: subtitle }} />}
-            <div className="w-20 h-1.5 bg-lhu-orange mx-auto rounded-full mt-8" />
-          </div>
+      <section id={anchorId} className="section-pad scroll-mt-24 overflow-hidden bg-[#091725] text-white">
+        <div className="site-shell">
+          <SectionIntro title={title} subtitle={subtitle} light />
           <ProductGallery products={products} />
         </div>
       </section>
@@ -78,49 +130,42 @@ export default function DynamicSection({
 
   if (layoutType === 'timeline') {
     return (
-      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
-            {subtitle && <p className="text-muted text-xl max-w-2xl mx-auto" dangerouslySetInnerHTML={{ __html: subtitle }} />}
-            <div className="w-20 h-1.5 bg-lhu-orange mx-auto rounded-full mt-8" />
-          </div>
+      <section id={anchorId} className={`section-pad scroll-mt-24 relative overflow-hidden ${sectionSurface}`}>
+        <div className="site-shell relative z-10">
+          <SectionIntro title={title} subtitle={subtitle} />
+          <div className="relative mx-auto max-w-5xl">
+            <div className="absolute bottom-0 left-5 top-0 w-px bg-card-border md:left-1/2" aria-hidden="true">
+              <motion.div
+                initial={{ scaleY: 0 }}
+                whileInView={{ scaleY: 1 }}
+                viewport={{ once: true, margin: '-120px' }}
+                transition={{ duration: 1.1, ease }}
+                className="h-full origin-top bg-gradient-to-b from-lhu-blue via-lhu-orange to-transparent"
+              />
+            </div>
 
-          <div className="max-w-4xl mx-auto relative">
-             {/* The vertical line */}
-             <div className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-white/10 to-transparent hidden md:block" />
-             
-             <div className="space-y-12">
-                {items.map((item, idx) => (
-                  <motion.div 
-                    key={idx}
-                    initial={{ opacity: 0, x: idx % 2 === 0 ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    transition={{ duration: 0.8, delay: idx * 0.1 }}
-                    className={`flex flex-col md:flex-row items-center gap-8 ${idx % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                  >
-                    {/* Content */}
-                    <div className="flex-1 w-full">
-                       <div className={`p-8 bg-card-bg backdrop-blur-2xl border border-card-border rounded-[28px] shadow-xl hover:border-lhu-blue/40 transition-all ${idx % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                          <div className={`w-12 h-12 bg-lhu-blue/10 rounded-2xl flex items-center justify-center mb-6 text-lhu-blue ${idx % 2 === 0 ? 'md:ml-auto' : 'md:mr-auto'}`}>
-                             <DynamicIcon name={item.icon} size={24} />
-                          </div>
-                          <h3 className="text-2xl font-bold mb-3 text-foreground">{item.title}</h3>
-                          <p className="text-muted leading-relaxed">{item.body}</p>
-                       </div>
-                    </div>
-                    
-                    {/* Center Dot */}
-                    <div className="w-12 h-12 bg-slate-900 border-4 border-lhu-orange rounded-full z-10 flex items-center justify-center text-lhu-orange shadow-[0_0_20px_rgba(242,103,34,0.3)] hidden md:flex">
-                       <div className="w-2 h-2 bg-lhu-orange rounded-full animate-ping" />
-                    </div>
-
-                    {/* Spacer for other side */}
-                    <div className="flex-1 hidden md:block" />
-                  </motion.div>
-                ))}
-             </div>
+            <div className="space-y-10 md:space-y-14">
+              {items.map((item, index) => (
+                <motion.article
+                  key={`${item.title}-${index}`}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -24 : 24 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: '-90px' }}
+                  transition={{ duration: 0.6, delay: index * 0.08, ease }}
+                  className={`relative grid pl-14 md:grid-cols-2 md:pl-0 ${index % 2 === 0 ? '' : 'md:[&>div]:col-start-2'}`}
+                >
+                  <span className="absolute left-2 top-7 grid size-7 place-items-center rounded-full border border-lhu-orange/60 bg-background md:left-1/2 md:-translate-x-1/2" aria-hidden="true">
+                    <span className="size-2 rounded-full bg-lhu-orange" />
+                  </span>
+                  <div className={`${index % 2 === 0 ? 'md:pr-14' : 'md:pl-14'} py-5`}>
+                    <DynamicIcon name={item.icon} size={25} className="text-lhu-blue" />
+                    <h3 className="font-display mt-5 text-2xl font-bold tracking-[-0.012em] text-foreground">{item.title}</h3>
+                    <p className="prose-copy mt-4 text-sm leading-7 text-muted sm:text-base">{item.body}</p>
+                    <ItemMedia item={item} />
+                  </div>
+                </motion.article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -128,108 +173,181 @@ export default function DynamicSection({
   }
 
   if (layoutType === 'script-embed') {
-    // ... (rest of the script-embed logic is fine)
     const scriptData = items[0];
     return (
-      <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground" dangerouslySetInnerHTML={{ __html: title }} />
-            {subtitle && <p className="text-muted text-xl max-w-2xl mx-auto mb-10" dangerouslySetInnerHTML={{ __html: subtitle }} />}
-          </div>
-          
-          <style dangerouslySetInnerHTML={{ __html: `
-            #${scriptData?.containerId || 'script-container'} iframe,
-            #${scriptData?.containerId || 'script-container'} div {
-              height: 100% !important;
-              min-height: 580px !important;
-            }
-          ` }} />
-          
-          <div className="max-w-5xl mx-auto bg-card-bg/50 backdrop-blur-xl border border-card-border rounded-[28px] p-2 h-[600px] relative overflow-hidden shadow-2xl grid place-items-stretch">
-             {/* Target Container for the Script */}
-             <div id={scriptData?.containerId || 'script-container'} className="w-full h-full overflow-hidden">
-                {!scriptData?.src && (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-slate-500 italic text-center px-10 leading-relaxed text-sm">Chưa cấu hình Script URL. Vui lòng nhập URL script trong trang quản trị để hiển thị sản phẩm nhúng.</p>
-                  </div>
-                )}
-             </div>
-
-             {/* External Script Injection */}
-             {scriptData?.src && (
-               <Script
-                 id={scriptData.id || 'dynamic-script'}
-                 src={scriptData.src}
-                 data-chatbot-id={scriptData.botId}
-                 data-target-id={scriptData.containerId}
-                 strategy="afterInteractive"
-               />
-             )}
+      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+        <div className="site-shell">
+          <SectionIntro title={title} subtitle={subtitle} />
+          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-card-border bg-[#050b12] p-2 shadow-[0_24px_70px_-40px_rgba(0,0,0,.9)]">
+            <div className="flex items-center gap-2 border-b border-white/9 px-4 py-3" aria-hidden="true">
+              <span className="size-2.5 rounded-full bg-lhu-orange" />
+              <span className="size-2.5 rounded-full bg-lhu-blue" />
+              <span className="size-2.5 rounded-full bg-white/20" />
+            </div>
+            <div id={scriptData?.containerId || 'script-container'} className="grid min-h-[34rem] w-full place-items-stretch overflow-hidden">
+              {!scriptData?.src && <p className="m-auto max-w-md px-6 text-center text-sm leading-7 text-[#8da3b5]">Chưa cấu hình Script URL. Vui lòng nhập URL trong trang quản trị để hiển thị sản phẩm nhúng.</p>}
+            </div>
+            {scriptData?.src && (
+              <Script
+                id={scriptData.id || 'dynamic-script'}
+                src={scriptData.src}
+                data-chatbot-id={scriptData.botId}
+                data-target-id={scriptData.containerId}
+                strategy="afterInteractive"
+              />
+            )}
           </div>
         </div>
-        
-        {bgStyle === 'gradient' && (
-          <>
-            <div className="absolute top-1/2 left-0 w-96 h-96 bg-lhu-blue/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-            <div className="absolute top-1/2 right-0 w-96 h-96 bg-lhu-orange/10 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-          </>
-        )}
+      </section>
+    );
+  }
+
+  if (layoutType === '1-col') {
+    return (
+      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+        <div className="site-shell">
+          <SectionIntro title={title} subtitle={subtitle} />
+          <div
+            className="accordion-spotlight mx-auto max-w-5xl overflow-hidden rounded-2xl border border-card-border bg-card-bg"
+            onPointerMove={(event) => {
+              const rect = event.currentTarget.getBoundingClientRect();
+              event.currentTarget.style.setProperty('--spot-x', `${event.clientX - rect.left}px`);
+              event.currentTarget.style.setProperty('--spot-y', `${event.clientY - rect.top}px`);
+            }}
+          >
+            {items.map((item, index) => {
+              const isOpen = openIndex === index;
+              return (
+                <div key={`${item.title}-${index}`} className="relative border-b border-card-border last:border-b-0">
+                  <button
+                    type="button"
+                    className="relative z-10 flex w-full items-center gap-5 px-5 py-6 text-left sm:px-8 sm:py-8"
+                    aria-expanded={isOpen}
+                    onClick={() => setOpenIndex(isOpen ? -1 : index)}
+                  >
+                    <DynamicIcon name={item.icon} size={23} className="shrink-0 text-lhu-blue" />
+                    <span className="font-display flex-1 text-lg font-bold tracking-[-0.012em] text-foreground sm:text-xl">{item.title}</span>
+                    <motion.span animate={{ rotate: isOpen ? 180 : 0 }} className="grid size-9 shrink-0 place-items-center rounded-full border border-card-border">
+                      <ChevronDown size={17} aria-hidden="true" />
+                    </motion.span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.32, ease }}
+                        className="relative z-10 overflow-hidden"
+                      >
+                        {item.image || item.linkUrl ? (
+                          <div className="max-w-3xl px-5 pb-7 pl-[4.75rem] sm:px-8 sm:pb-9 sm:pl-[5.25rem]">
+                            <p className="prose-copy text-sm leading-7 text-muted sm:text-base">{item.body}</p>
+                            <ItemMedia item={item} />
+                          </div>
+                        ) : (
+                          <p className="prose-copy max-w-3xl px-5 pb-7 pl-[4.75rem] text-sm leading-7 text-muted sm:px-8 sm:pb-9 sm:pl-[5.25rem] sm:text-base">{item.body}</p>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (layoutType === '2-col') {
+    return (
+      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+        <div className="site-shell">
+          <SectionIntro title={title} subtitle={subtitle} />
+          <div className="grid gap-x-14 gap-y-10 md:grid-cols-2">
+            {items.map((item, index) => (
+              <motion.article
+                key={`${item.title}-${index}`}
+                initial={{ opacity: 0, x: index % 2 === 0 ? -22 : 22 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.58, delay: index * 0.08, ease }}
+                className="border-t border-card-border pt-7"
+              >
+                <div className="flex items-center gap-4">
+                  <DynamicIcon name={item.icon} size={25} className="text-lhu-blue" />
+                  <h3 className="font-display text-2xl font-bold tracking-[-0.012em] text-foreground">{item.title}</h3>
+                </div>
+                <p className="prose-copy mt-6 max-w-[62ch] text-base leading-8 text-muted">{item.body}</p>
+                <ItemMedia item={item} />
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (layoutType === '4-col') {
+    return (
+      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+        <div className="site-shell">
+          <SectionIntro title={title} subtitle={subtitle} />
+          <div className="divide-y divide-card-border border-y border-card-border">
+            {items.map((item, index) => (
+              <motion.article
+                key={`${item.title}-${index}`}
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-70px' }}
+                transition={{ duration: 0.5, delay: index * 0.06, ease }}
+                className="grid gap-5 py-6 sm:grid-cols-[3rem_1fr] md:grid-cols-[3rem_3rem_.8fr_1.2fr] md:items-center md:gap-7 md:py-8"
+              >
+                <span className="font-display text-sm font-bold tabular-nums text-lhu-orange">{String(index + 1).padStart(2, '0')}</span>
+                <DynamicIcon name={item.icon} size={24} className="hidden text-lhu-blue sm:block" />
+                <h3 className="font-display text-xl font-bold tracking-[-0.012em] text-foreground sm:col-start-2 md:col-start-auto">{item.title}</h3>
+                <p className="prose-copy text-sm leading-7 text-muted sm:col-start-2 md:col-start-auto sm:text-base">{item.body}</p>
+                {(item.image || item.linkUrl) && (
+                  <div className="sm:col-start-2 md:col-start-4">
+                    <ItemMedia item={item} />
+                  </div>
+                )}
+              </motion.article>
+            ))}
+          </div>
+        </div>
       </section>
     );
   }
 
   return (
-    <section id={anchorId} className={`scroll-mt-24 py-32 relative overflow-hidden transition-colors duration-500 ${getBgClass()}`}>
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-20">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-black mb-6 text-foreground"
-            dangerouslySetInnerHTML={{ __html: title }}
-          />
-          {subtitle && (
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
+    <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+      <div className="site-shell">
+        <SectionIntro title={title} subtitle={subtitle} />
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((item, index) => (
+            <motion.article
+              key={`${item.title}-${index}`}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-muted text-xl max-w-2xl mx-auto"
-              dangerouslySetInnerHTML={{ __html: subtitle }}
-            />
-          )}
-          <div className="w-20 h-1.5 bg-lhu-orange mx-auto rounded-full mt-8" />
-        </div>
-
-        <div className={`grid ${getGridClass()}`}>
-          {items.map((item, idx) => (
-            <motion.div
-              key={idx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-              className="bg-card-bg backdrop-blur-xl border border-card-border p-10 rounded-[24px] hover:border-lhu-blue/50 transition-all group hover:shadow-2xl"
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.55, delay: index * 0.08, ease }}
+              className={`group p-7 sm:p-9 ${index === 0 ? 'rounded-2xl bg-[#091725] text-white md:col-span-2 lg:grid lg:grid-cols-[.45fr_1fr] lg:gap-12 lg:col-span-2' : 'border-t border-card-border bg-transparent'}`}
             >
-              <div className="w-14 h-14 bg-lhu-blue/10 rounded-2xl flex items-center justify-center mb-8 text-lhu-blue group-hover:bg-lhu-blue group-hover:text-white transition-all shadow-lg border border-lhu-blue/20">
-                <DynamicIcon name={item.icon} size={28} />
+              <div className="flex items-start justify-between">
+                <DynamicIcon name={item.icon} size={28} className={`${index === 0 ? 'text-lhu-orange' : 'text-lhu-blue'} transition-transform duration-300 group-hover:-translate-y-1`} />
+                <span className={`font-display text-xs font-bold tabular-nums ${index === 0 ? 'text-[#8fa6b7]' : 'text-muted'}`}>{String(index + 1).padStart(2, '0')}</span>
               </div>
-              <h3 className="text-2xl font-bold mb-4 text-foreground">{item.title}</h3>
-              <p className="text-muted leading-relaxed">{item.body}</p>
-            </motion.div>
+              <div>
+                <h3 className={`font-display mt-10 text-2xl font-bold tracking-[-0.012em] ${index === 0 ? 'text-white lg:mt-0 lg:text-3xl' : 'text-foreground'}`}>{item.title}</h3>
+                <p className={`prose-copy mt-5 text-sm leading-7 sm:text-base ${index === 0 ? 'text-[#aec0cd]' : 'text-muted'}`}>{item.body}</p>
+                <ItemMedia item={item} light={index === 0} />
+              </div>
+            </motion.article>
           ))}
         </div>
       </div>
-
-      {/* Decorative logic */}
-      {bgStyle === 'gradient' && (
-        <>
-          <div className="absolute top-1/2 left-0 w-96 h-96 bg-lhu-blue/10 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-          <div className="absolute top-1/2 right-0 w-96 h-96 bg-lhu-orange/10 rounded-full blur-[100px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        </>
-      )}
     </section>
   );
 }

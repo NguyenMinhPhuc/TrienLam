@@ -1,0 +1,435 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-04T11:24:14.9041331+07:00",
+  "title": "Design System: LHU Tech Hub",
+  "extensions": {
+    "colorMeta": {
+      "signal-blue": {
+        "role": "primary",
+        "displayName": "LHU Signal Blue",
+        "canonical": "#2385c1",
+        "tonalRamp": [
+          "oklch(15% 0.126 241.5)",
+          "oklch(27% 0.126 241.5)",
+          "oklch(39% 0.126 241.5)",
+          "oklch(51% 0.126 241.5)",
+          "oklch(63% 0.126 241.5)",
+          "oklch(75% 0.126 241.5)",
+          "oklch(87% 0.126 241.5)",
+          "oklch(95% 0.126 241.5)"
+        ]
+      },
+      "action-orange": {
+        "role": "secondary",
+        "displayName": "LHU Action Orange",
+        "canonical": "#f37021",
+        "tonalRamp": [
+          "oklch(15% 0.181 46.2)",
+          "oklch(27% 0.181 46.2)",
+          "oklch(39% 0.181 46.2)",
+          "oklch(51% 0.181 46.2)",
+          "oklch(63% 0.181 46.2)",
+          "oklch(75% 0.181 46.2)",
+          "oklch(87% 0.181 46.2)",
+          "oklch(95% 0.181 46.2)"
+        ]
+      },
+      "action-orange-hover": {
+        "role": "secondary",
+        "displayName": "Action Orange Lift",
+        "canonical": "#ff7b2a",
+        "tonalRamp": [
+          "oklch(15% 0.183 47.3)",
+          "oklch(27% 0.183 47.3)",
+          "oklch(39% 0.183 47.3)",
+          "oklch(51% 0.183 47.3)",
+          "oklch(63% 0.183 47.3)",
+          "oklch(75% 0.183 47.3)",
+          "oklch(87% 0.183 47.3)",
+          "oklch(95% 0.183 47.3)"
+        ]
+      },
+      "blueprint-navy": {
+        "role": "neutral",
+        "displayName": "Blueprint Navy",
+        "canonical": "#07111d",
+        "tonalRamp": [
+          "oklch(15% 0.029 253.1)",
+          "oklch(27% 0.029 253.1)",
+          "oklch(39% 0.029 253.1)",
+          "oklch(51% 0.029 253.1)",
+          "oklch(63% 0.029 253.1)",
+          "oklch(75% 0.029 253.1)",
+          "oklch(87% 0.029 253.1)",
+          "oklch(95% 0.029 253.1)"
+        ]
+      },
+      "deep-ink": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "#050b12",
+        "tonalRamp": [
+          "oklch(15% 0.019 249.1)",
+          "oklch(27% 0.019 249.1)",
+          "oklch(39% 0.019 249.1)",
+          "oklch(51% 0.019 249.1)",
+          "oklch(63% 0.019 249.1)",
+          "oklch(75% 0.019 249.1)",
+          "oklch(87% 0.019 249.1)",
+          "oklch(95% 0.019 249.1)"
+        ]
+      },
+      "navy-surface": {
+        "role": "neutral",
+        "displayName": "Navy Surface",
+        "canonical": "#091725",
+        "tonalRamp": [
+          "oklch(15% 0.034 249.9)",
+          "oklch(27% 0.034 249.9)",
+          "oklch(39% 0.034 249.9)",
+          "oklch(51% 0.034 249.9)",
+          "oklch(63% 0.034 249.9)",
+          "oklch(75% 0.034 249.9)",
+          "oklch(87% 0.034 249.9)",
+          "oklch(95% 0.034 249.9)"
+        ]
+      },
+      "navy-panel": {
+        "role": "neutral",
+        "displayName": "Navy Panel",
+        "canonical": "#0d1b29",
+        "tonalRamp": [
+          "oklch(15% 0.034 249.6)",
+          "oklch(27% 0.034 249.6)",
+          "oklch(39% 0.034 249.6)",
+          "oklch(51% 0.034 249.6)",
+          "oklch(63% 0.034 249.6)",
+          "oklch(75% 0.034 249.6)",
+          "oklch(87% 0.034 249.6)",
+          "oklch(95% 0.034 249.6)"
+        ]
+      },
+      "canvas-light": {
+        "role": "neutral",
+        "displayName": "Blueprint Paper",
+        "canonical": "#edf4f8",
+        "tonalRamp": [
+          "oklch(15% 0.009 232.4)",
+          "oklch(27% 0.009 232.4)",
+          "oklch(39% 0.009 232.4)",
+          "oklch(51% 0.009 232.4)",
+          "oklch(63% 0.009 232.4)",
+          "oklch(75% 0.009 232.4)",
+          "oklch(87% 0.009 232.4)",
+          "oklch(95% 0.009 232.4)"
+        ]
+      },
+      "body-ink": {
+        "role": "neutral",
+        "displayName": "Body Ink",
+        "canonical": "#08131f",
+        "tonalRamp": [
+          "oklch(15% 0.030 251.4)",
+          "oklch(27% 0.030 251.4)",
+          "oklch(39% 0.030 251.4)",
+          "oklch(51% 0.030 251.4)",
+          "oklch(63% 0.030 251.4)",
+          "oklch(75% 0.030 251.4)",
+          "oklch(87% 0.030 251.4)",
+          "oklch(95% 0.030 251.4)"
+        ]
+      },
+      "card-light": {
+        "role": "neutral",
+        "displayName": "Card White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0 0)",
+          "oklch(27% 0 0)",
+          "oklch(39% 0 0)",
+          "oklch(51% 0 0)",
+          "oklch(63% 0 0)",
+          "oklch(75% 0 0)",
+          "oklch(87% 0 0)",
+          "oklch(95% 0 0)"
+        ]
+      },
+      "paper-white": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#f4f8fb",
+        "tonalRamp": [
+          "oklch(15% 0.006 239.8)",
+          "oklch(27% 0.006 239.8)",
+          "oklch(39% 0.006 239.8)",
+          "oklch(51% 0.006 239.8)",
+          "oklch(63% 0.006 239.8)",
+          "oklch(75% 0.006 239.8)",
+          "oklch(87% 0.006 239.8)",
+          "oklch(95% 0.006 239.8)"
+        ]
+      },
+      "muted-on-light": {
+        "role": "neutral",
+        "displayName": "Muted Slate",
+        "canonical": "#526678",
+        "tonalRamp": [
+          "oklch(15% 0.038 245.8)",
+          "oklch(27% 0.038 245.8)",
+          "oklch(39% 0.038 245.8)",
+          "oklch(51% 0.038 245.8)",
+          "oklch(63% 0.038 245.8)",
+          "oklch(75% 0.038 245.8)",
+          "oklch(87% 0.038 245.8)",
+          "oklch(95% 0.038 245.8)"
+        ]
+      },
+      "muted-on-dark": {
+        "role": "neutral",
+        "displayName": "Muted Mist",
+        "canonical": "#9eb1c1",
+        "tonalRamp": [
+          "oklch(15% 0.031 243.6)",
+          "oklch(27% 0.031 243.6)",
+          "oklch(39% 0.031 243.6)",
+          "oklch(51% 0.031 243.6)",
+          "oklch(63% 0.031 243.6)",
+          "oklch(75% 0.031 243.6)",
+          "oklch(87% 0.031 243.6)",
+          "oklch(95% 0.031 243.6)"
+        ]
+      },
+      "copy-on-dark": {
+        "role": "neutral",
+        "displayName": "Drafting Copy",
+        "canonical": "#aec0cd",
+        "tonalRamp": [
+          "oklch(15% 0.027 239.2)",
+          "oklch(27% 0.027 239.2)",
+          "oklch(39% 0.027 239.2)",
+          "oklch(51% 0.027 239.2)",
+          "oklch(63% 0.027 239.2)",
+          "oklch(75% 0.027 239.2)",
+          "oklch(87% 0.027 239.2)",
+          "oklch(95% 0.027 239.2)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero statements and rare full-width brand moments."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Primary section titles with balanced wrapping."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cards, accordions, and local content anchors."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Vietnamese explanatory copy and form content."
+      },
+      "label": {
+        "displayName": "Technical Label",
+        "purpose": "Metadata, progress, categories, and short utility markers."
+      },
+      "micro-label": {
+        "displayName": "Micro Label",
+        "purpose": "Orbit markers, compact product tags, and other nonessential technical annotations."
+      }
+    },
+    "shadows": [
+      {
+        "name": "action-glow",
+        "value": "0 14px 36px -18px rgba(243, 112, 33, 0.95)",
+        "purpose": "Warm resting glow under the primary action."
+      },
+      {
+        "name": "action-glow-hover",
+        "value": "0 20px 42px -18px rgba(243, 112, 33, 0.95)",
+        "purpose": "Expanded glow paired with the two-pixel primary-action lift."
+      },
+      {
+        "name": "navigation-float",
+        "value": "0 16px 40px -28px rgba(0, 0, 0, 0.9)",
+        "purpose": "Separates the fixed navigation after the page scrolls."
+      },
+      {
+        "name": "project-lift",
+        "value": "0 28px 80px -42px rgba(0, 0, 0, 0.95)",
+        "purpose": "Supports featured sticky project cards."
+      },
+      {
+        "name": "dialog-lift",
+        "value": "0 32px 120px -30px rgba(0, 0, 0, 0.95)",
+        "purpose": "Isolates the product modal above its blurred backdrop."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-emphasized",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Shared easing for reveals, panel transitions, image wipes, and navigation sheets."
+      },
+      {
+        "name": "state-quick",
+        "value": "180ms ease",
+        "purpose": "Hover translation, color, border, and shadow feedback."
+      },
+      {
+        "name": "reveal-standard",
+        "value": "550ms–700ms",
+        "purpose": "Section copy, metrics, cards, and directional entrance motion."
+      },
+      {
+        "name": "reveal-cinematic",
+        "value": "800ms–1100ms",
+        "purpose": "Hero blur-and-rise, faculty image wipe, and timeline growth. Text clipping is not used on display copy."
+      },
+      {
+        "name": "radar-drift",
+        "value": "9s cubic-bezier(0.22, 1, 0.36, 1) infinite alternate",
+        "purpose": "Slow ambient movement for the hero instrument only."
+      },
+      {
+        "name": "footer-signal-drift",
+        "value": "18s linear infinite",
+        "purpose": "Moves the footer dot field without competing with content."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "0.01ms duration; 1 iteration; smooth scrolling disabled",
+        "purpose": "Collapses animation and transition behavior when reduced motion is requested."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The warm, decisive action used for quiz starts, submissions, admissions, and product launches.",
+      "html": "<button class=\"ds-btn-primary\">Bắt đầu trắc nghiệm <svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M5 12h14M13 6l6 6-6 6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 0.65rem; border: 0; border-radius: 14px; padding: 0.8rem 1.25rem; background: var(--color-lhu-orange, #f37021); color: #07111d; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; font-size: 0.875rem; font-weight: 700; cursor: pointer; box-shadow: 0 14px 36px -18px rgba(243, 112, 33, 0.95); transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease; } .ds-btn-primary svg { width: 18px; height: 18px; } .ds-btn-primary:hover { transform: translateY(-2px); background: #ff7b2a; box-shadow: 0 20px 42px -18px rgba(243, 112, 33, 0.95); } .ds-btn-primary:active { transform: translateY(0); } .ds-btn-primary:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: 4px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A glassy dark-surface action for lower-priority exploration.",
+      "html": "<button class=\"ds-btn-secondary\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" fill=\"none\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"16\" rx=\"2\" stroke=\"currentColor\" stroke-width=\"2\"/><path d=\"M3 9h18M8 9v11\" stroke=\"currentColor\" stroke-width=\"2\"/></svg> Khám phá sản phẩm</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; min-height: 52px; align-items: center; justify-content: center; gap: 0.65rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px; padding: 0.8rem 1.25rem; background: rgba(255, 255, 255, 0.07); color: #f4f8fb; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; font-size: 0.875rem; font-weight: 700; cursor: pointer; transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease; } .ds-btn-secondary svg { width: 17px; height: 17px; } .ds-btn-secondary:hover { transform: translateY(-2px); border-color: rgba(35, 133, 193, 0.6); background: rgba(35, 133, 193, 0.12); } .ds-btn-secondary:active { transform: translateY(0); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: 4px; }"
+    },
+    {
+      "name": "Contact Field",
+      "kind": "input",
+      "refersTo": "contact-field",
+      "description": "An underline-only field used on Blueprint Navy contact surfaces.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">EMAIL LIÊN HỆ</span><input class=\"ds-field-input\" type=\"email\" placeholder=\"example@gmail.com\" /></label>",
+      "css": ".ds-field { display: grid; gap: 0.25rem; width: min(100%, 32rem); font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; } .ds-field-label { color: #91a6b7; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; } .ds-field-input { width: 100%; border: 0; border-bottom: 1px solid rgba(255, 255, 255, 0.16); border-radius: 0; padding: 1rem 0; background: transparent; color: #f4f8fb; font: 400 1rem/1.5 var(--font-body, \"Be Vietnam Pro\"), sans-serif; transition: border-color 180ms ease; } .ds-field-input::placeholder { color: #6f8597; } .ds-field-input:focus { border-color: var(--color-lhu-blue, #2385c1); outline: 0; } .ds-field-input:focus-visible { box-shadow: 0 3px 0 -2px var(--color-lhu-blue, #2385c1); }"
+    },
+    {
+      "name": "Dark Navigation",
+      "kind": "nav",
+      "refersTo": "navigation-dark",
+      "description": "The scrolled fixed-header state with compact rounded link wells and one orange action.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Điều hướng mẫu\"><a class=\"ds-brand\" href=\"#\"><span class=\"ds-brand-lhu\">LHU</span><span class=\"ds-brand-tech\">TECH HUB</span></a><div class=\"ds-nav-links\"><a class=\"ds-nav-link\" href=\"#\">Khoa CNTT</a><a class=\"ds-nav-link\" href=\"#\">Sản phẩm</a><a class=\"ds-nav-cta\" href=\"#\">Tuyển sinh 2026</a></div></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 64px; padding: 0.75rem 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(7, 17, 29, 0.92); color: #f4f8fb; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; box-shadow: 0 16px 40px -28px rgba(0, 0, 0, 0.9); backdrop-filter: blur(20px); } .ds-brand { display: inline-flex; min-height: 44px; align-items: center; gap: 0.375rem; text-decoration: none; font-family: var(--font-display, Lexend), sans-serif; font-size: 1.25rem; font-weight: 700; letter-spacing: -0.012em; } .ds-brand-lhu { color: var(--color-lhu-orange, #f37021); } .ds-brand-tech { color: #4aa6dc; } .ds-nav-links { display: flex; align-items: center; gap: 0.25rem; } .ds-nav-link, .ds-nav-cta { border-radius: 12px; padding: 0.625rem 1rem; color: #bfd0dc; text-decoration: none; font-size: 0.8125rem; font-weight: 600; transition: color 180ms ease, background-color 180ms ease; } .ds-nav-link:hover { background: rgba(255, 255, 255, 0.07); color: #fff; } .ds-nav-cta { margin-left: 0.5rem; background: var(--color-lhu-orange, #f37021); color: #07111d; font-weight: 700; } .ds-nav a:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: 4px; } @media (max-width: 640px) { .ds-nav-link { display: none; } .ds-nav-cta { padding-inline: 0.75rem; } }"
+    },
+    {
+      "name": "Filter Chips",
+      "kind": "chip",
+      "refersTo": "filter-chip-active",
+      "description": "Product-category controls showing the inactive hairline and active pale-blue signal states.",
+      "html": "<div class=\"ds-chip-group\" aria-label=\"Bộ lọc mẫu\"><button class=\"ds-chip ds-chip-active\" aria-pressed=\"true\">Tất cả</button><button class=\"ds-chip\" aria-pressed=\"false\">Phần mềm</button><button class=\"ds-chip\" aria-pressed=\"false\">Trí tuệ nhân tạo</button></div>",
+      "css": ".ds-chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; background: #091725; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; } .ds-chip { display: inline-flex; min-height: 44px; align-items: center; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 999px; padding: 0.5rem 1rem; background: transparent; color: #b7c8d5; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: color 180ms ease, border-color 180ms ease, background-color 180ms ease; } .ds-chip:hover { border-color: rgba(35, 133, 193, 0.7); color: #fff; } .ds-chip-active { border-color: #a9d6ef; background: #a9d6ef; color: #07111d; } .ds-chip:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: 4px; }"
+    },
+    {
+      "name": "Featured Project Card",
+      "kind": "card",
+      "refersTo": "project-card-dark",
+      "description": "The dark, indexed project container used in the sticky showcase stack.",
+      "html": "<article class=\"ds-project\"><div class=\"ds-project-copy\"><div class=\"ds-project-top\"><span class=\"ds-project-index\">01</span><span class=\"ds-project-tag\">TRÍ TUỆ NHÂN TẠO</span></div><p class=\"ds-project-meta\">2026 · Sinh viên Khoa CNTT</p><h3>Dự án công nghệ nổi bật</h3><p class=\"ds-project-body\">Một mô tả ngắn cho sản phẩm thực tế, công nghệ sử dụng và giá trị người học tạo ra.</p><button class=\"ds-project-arrow\" aria-label=\"Xem dự án\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M7 17 17 7M8 7h9v9\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button></div><div class=\"ds-project-media\" aria-hidden=\"true\"><span>PROJECT / LHU</span></div></article>",
+      "css": ".ds-project { display: grid; grid-template-columns: minmax(16rem, 0.78fr) minmax(18rem, 1.22fr); overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 16px; background: #0b1825; color: #f4f8fb; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; box-shadow: 0 28px 80px -42px rgba(0, 0, 0, 0.95); } .ds-project-copy { position: relative; display: flex; min-height: 31rem; flex-direction: column; padding: 2.5rem; } .ds-project-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1.25rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); } .ds-project-index { font-family: var(--font-display, Lexend), sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; letter-spacing: -0.04em; color: #d9e5ed; } .ds-project-tag { border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 999px; padding: 0.375rem 0.75rem; color: #a9bdcb; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.13em; } .ds-project-meta { margin: 2rem 0 0; color: #8fa6b7; font-size: 0.75rem; font-weight: 600; } .ds-project h3 { margin: 1.25rem 0 0; font-family: var(--font-display, Lexend), sans-serif; font-size: 2rem; line-height: 1.2; letter-spacing: -0.012em; } .ds-project-body { margin: 1.25rem 0 0; color: #a9bdcb; font-size: 0.875rem; line-height: 1.75; } .ds-project-arrow { display: grid; width: 48px; height: 48px; place-items: center; margin: auto 0 0 auto; border: 0; border-radius: 50%; background: var(--color-lhu-orange, #f37021); color: #fff; cursor: pointer; transition: transform 180ms ease; } .ds-project-arrow svg { width: 20px; height: 20px; } .ds-project-arrow:hover { transform: rotate(45deg); } .ds-project-arrow:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: 4px; } .ds-project-media { display: grid; min-height: 31rem; place-items: end start; padding: 2rem; background-color: #050b12; background-image: linear-gradient(rgba(35, 133, 193, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(35, 133, 193, 0.12) 1px, transparent 1px), radial-gradient(circle at 68% 35%, rgba(35, 133, 193, 0.28), transparent 34%); background-size: 48px 48px, 48px 48px, auto; } .ds-project-media span { color: #84c2e6; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.16em; } @media (max-width: 700px) { .ds-project { grid-template-columns: 1fr; } .ds-project-copy { min-height: 26rem; padding: 1.5rem; } .ds-project-media { min-height: 16rem; } }"
+    },
+    {
+      "name": "Accordion Row",
+      "kind": "custom",
+      "refersTo": "accordion-row",
+      "description": "The Apex-inspired content row with a blue technical signal and restrained reveal.",
+      "html": "<details class=\"ds-accordion\" open><summary><span class=\"ds-accordion-icon\">01</span><span>Câu hỏi về chương trình đào tạo</span><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"m6 9 6 6 6-6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></summary><p>Nội dung mở rộng được giữ trong một cột đọc ngắn, rõ và có nhịp dòng thoáng.</p></details>",
+      "css": ".ds-accordion { overflow: hidden; border: 1px solid rgba(220, 235, 246, 0.11); border-radius: 16px; background: #0d1b29; color: #f4f8fb; font-family: var(--font-body, \"Be Vietnam Pro\"), sans-serif; transition: background 180ms ease; } .ds-accordion:hover { background-image: radial-gradient(420px circle at 50% 0%, rgba(35, 133, 193, 0.12), transparent 55%); } .ds-accordion summary { display: flex; min-height: 76px; align-items: center; gap: 1.25rem; padding: 1.5rem 2rem; cursor: pointer; list-style: none; font-family: var(--font-display, Lexend), sans-serif; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.012em; } .ds-accordion summary::-webkit-details-marker { display: none; } .ds-accordion-icon { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border-radius: 50%; border: 1px solid rgba(35, 133, 193, 0.45); color: var(--color-lhu-blue, #2385c1); font: 700 0.75rem/1 var(--font-display, Lexend), sans-serif; } .ds-accordion summary > span:nth-child(2) { flex: 1; } .ds-accordion summary svg { width: 36px; height: 36px; padding: 9px; border: 1px solid rgba(220, 235, 246, 0.11); border-radius: 50%; transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1); } .ds-accordion[open] summary svg { transform: rotate(180deg); } .ds-accordion p { max-width: 44rem; margin: 0; padding: 0 2rem 2rem 5.25rem; color: #9eb1c1; font-size: 0.9375rem; line-height: 1.75; } .ds-accordion summary:focus-visible { outline: 3px solid var(--color-lhu-orange, #f37021); outline-offset: -4px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "LHU Blueprint Studio",
+    "overview": "LHU Tech Hub feels like an institutional technology studio after dark: exact enough to signal academic credibility, vivid enough to make student work feel alive. Blueprint grids, measured rules, deep navy planes, technical labels, and large editorial type organize the experience without turning it into a generic software dashboard.\n\nEach section owns a distinct motion signature—cinematic reveal, counting signal, image wipe, sticky project stack, step transition, spotlight accordion, or drifting footer field—but every signature uses the same restrained geometry, blue/orange signal logic, and confident easing. The result should feel authored section by section while remaining unmistakably one LHU system.\n\nThe reference lineage is deliberately section-specific: CodeNest Hero, Arceage Stats, Axion About, Projects Catalog, Apex Accordion, Multi-step Quiz, Arceage Contact, and Stark Footer. Treat them as directional precedents for their assigned patterns, not as templates to reproduce or blend wholesale.",
+    "keyCharacteristics": [
+      "Dark institutional surfaces anchored by navy, never featureless black.",
+      "LHU blue communicates structure, information, and technological signal.",
+      "LHU orange marks action, emphasis, progress, and decisive moments.",
+      "Clear, open Lexend display type is paired with highly readable Be Vietnam Pro body copy.",
+      "Blueprint grids, hairline rules, indices, and circular instruments provide the recurring technical grammar.",
+      "Motion varies by section, remains purposeful, and collapses cleanly under reduced-motion preferences."
+    ],
+    "rules": [
+      {
+        "name": "The Signal and Action Rule",
+        "body": "Blue explains where the user is; orange tells the user what to do next. Do not give both accents equal visual weight inside one component.",
+        "section": "colors"
+      },
+      {
+        "name": "The Dark Anchor Rule",
+        "body": "Major narrative anchors stay on Blueprint Navy, Navy Surface, or Deep Ink so media, metrics, and orange actions retain contrast and authority.",
+        "section": "colors"
+      },
+      {
+        "name": "The Two-Voice Rule",
+        "body": "Lexend carries hierarchy and identity; Be Vietnam Pro carries reading and interaction. Do not introduce a third display or body family, and never compress Vietnamese display lines below the established line-height.",
+        "section": "typography"
+      },
+      {
+        "name": "The Alignment Rule",
+        "body": "Long-form prose and the full mission quotation use inter-word justification from 640px upward. Headings, labels, controls, short descriptions, and compact mobile prose remain left-aligned to avoid stretched word spaces; the final justified line remains naturally left-aligned.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal-First Rule",
+        "body": "Separate ordinary surfaces with navy steps and hairline borders; reserve strong shadows for controls or layers that genuinely move above the page.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the public experience dark-led while preserving the implemented light semantic canvas and card mode.",
+      "Do use Signal Blue for structure and information, then reserve Action Orange for decisions, progress, and directional emphasis.",
+      "Do give each major section one legible motion signature while keeping the shared easing, restraint, and reduced-motion fallback.",
+      "Do align new sections to the 80rem shell, the established section rhythm, and the responsive reading order.",
+      "Do preserve visible focus, touch targets of at least 44px, CMS empty states, and readable contrast on every surface.",
+      "Do set long mission or vision statements in Be Vietnam Pro at 1.25rem–1.9rem, around 64ch, with 1.62 line-height; reserve Lexend for the short section label."
+    ],
+    "donts": [
+      "Don't flatten the page into repeated equal cards; alternate editorial splits, ruled grids, stacked projects, timelines, and focused interaction panels.",
+      "Don't use blue and orange as interchangeable decoration or give them equal emphasis inside one component.",
+      "Don't introduce a third typeface, over-tighten display tracking, compress Vietnamese line-height, or set long copy in the display face.",
+      "Don't use large shadows as a default border substitute; ordinary depth comes from tone, hairlines, grids, and media wells.",
+      "Don't autoplay ornamental motion when reduced motion is requested, or add movement that competes with reading and form completion."
+    ]
+  }
+}

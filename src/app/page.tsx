@@ -6,7 +6,8 @@ import CareerQuiz from '@/components/CareerQuiz';
 import StatsSection from '@/components/StatsSection';
 import ContactSection from '@/components/ContactSection';
 import DynamicSection from '@/components/DynamicSection';
-import CmsImage from '@/components/CmsImage';
+import FacultySection from '@/components/FacultySection';
+import MissionSection from '@/components/MissionSection';
 import type {
   CustomSectionData,
   Industry,
@@ -17,6 +18,7 @@ import type {
   SiteContentRow,
   StatData,
 } from '@/lib/types';
+import { contentValue } from '@/lib/site-content';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,64 +121,48 @@ export default async function Home() {
     <main className="overflow-x-hidden bg-background text-foreground transition-colors duration-500">
       {/* Hero Section */}
       <Hero 
-        title={content.hero_title || 'Nơi Khởi Đầu <br/><span class="gradient-text tracking-tighter">Đam Mê Công Nghệ</span>'} 
-        subtitle={content.hero_subtitle || 'Trải nghiệm hệ sinh thái AI độc quyền từ Đại học Lạc Hồng. Khám phá lộ trình nghề nghiệp IT tương lai.'} 
+        title={contentValue(content, 'hero_title')}
+        subtitle={contentValue(content, 'hero_subtitle')}
+        productsLabel={contentValue(content, 'hero_products_label')}
+        productsUrl={contentValue(content, 'hero_products_url')}
+        quizLabel={contentValue(content, 'hero_quiz_label')}
+        quizUrl={contentValue(content, 'hero_quiz_url')}
+        scrollLabel={contentValue(content, 'hero_scroll_label')}
+        scrollUrl={contentValue(content, 'hero_scroll_url')}
+        videoSrc={contentValue(content, 'hero_video_src')}
+        posterSrc={contentValue(content, 'hero_poster_src')}
       />
 
       {/* Stats Section */}
-      <StatsSection stats={stats} />
+      <StatsSection
+        stats={stats}
+        title={contentValue(content, 'stats_title')}
+        description={contentValue(content, 'stats_description')}
+      />
 
-      {/* Faculty Section */}
-      <section id="faculty" className="py-32 relative">
-        <div className="container mx-auto px-4">
-          <div className="bg-card-bg backdrop-blur-2xl border border-card-border rounded-[40px] p-12 md:p-24 relative overflow-hidden shadow-2xl">
-            <div className="relative z-10 grid md:grid-cols-2 gap-16 items-center">
-              <div>
-                <h2 className="text-4xl md:text-5xl font-black mb-8 leading-tight">
-                  Về Khoa <br/>
-                  <span className="text-lhu-blue">Công Nghệ Thông Tin</span>
-                </h2>
-                <div 
-                  className="text-muted text-lg md:text-xl leading-relaxed space-y-6"
-                  dangerouslySetInnerHTML={{ __html: content.about_faculty || 'Đang cập nhật nội dung từ Ban Giám Hiệu Khoa CNTT. LHU luôn tiên phong trong đào tạo kỹ năng thực chiến và tư duy sáng tạo.' }}
-                />
-                
-                <div className="mt-12 flex gap-4">
-                   <a href="https://cs.lhu.edu.vn" target="_blank" rel="noopener noreferrer" className="text-lhu-orange font-bold hover:underline flex items-center gap-2">
-                      Xem trang chủ của Khoa &rarr;
-                   </a>
-                </div>
-              </div>
-              
-              <div className="relative">
-                  <div className="relative w-full aspect-square rounded-[28px] overflow-hidden rotate-3 hover:rotate-0 transition-transform duration-700 shadow-2xl border-4 border-white dark:border-white/10">
-                    <CmsImage
-                      src={content.about_faculty_image || "https://lhu.edu.vn/Data/News/391/files/LHU%20DH%20Lac%20Hong-1(1).jpg"} 
-                      alt="Khoa Công nghệ Thông tin, Đại học Lạc Hồng"
-                      sizes="(min-width: 768px) 50vw, 100vw"
-                      className="object-cover"
-                    />
-                  </div>
-                 <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-lhu-orange/20 rounded-full blur-3xl" />
-              </div>
-            </div>
-            {/* Background elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-lhu-blue/5 rounded-full blur-3xl -mr-20 -mt-20" />
-          </div>
-        </div>
-      </section>
+      <FacultySection
+        title={contentValue(content, 'faculty_title')}
+        content={contentValue(content, 'about_faculty')}
+        image={contentValue(content, 'about_faculty_image')}
+        imageAlt={contentValue(content, 'faculty_image_alt')}
+        ctaLabel={contentValue(content, 'faculty_cta_label')}
+        ctaUrl={contentValue(content, 'faculty_cta_url')}
+        featureOne={contentValue(content, 'faculty_feature_one')}
+        featureTwo={contentValue(content, 'faculty_feature_two')}
+        mediaCaption={contentValue(content, 'faculty_media_caption')}
+        mediaLocation={contentValue(content, 'faculty_media_location')}
+      />
 
       {!hasDynamicProductSection && (
-        <section id="products" className="scroll-mt-24 py-32 relative">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black mb-6 text-foreground">
-                Sản phẩm công nghệ nổi bật
+        <section id="products" className="section-pad scroll-mt-24 relative overflow-hidden bg-[#091725] text-white">
+          <div className="site-shell">
+            <div className="mb-14 grid gap-6 md:grid-cols-[1fr_.75fr] md:items-end">
+              <h2 className="section-title text-white">
+                {contentValue(content, 'products_title')}
               </h2>
-              <p className="text-muted text-xl max-w-2xl mx-auto">
-                Khám phá các dự án thực tế được phát triển bởi sinh viên Khoa Công nghệ Thông tin.
+              <p className="section-copy-on-dark md:justify-self-end">
+                {contentValue(content, 'products_description')}
               </p>
-              <div className="w-20 h-1.5 bg-lhu-orange mx-auto rounded-full mt-8" />
             </div>
             <ProductGallery products={products} />
           </div>
@@ -198,24 +184,36 @@ export default async function Home() {
       ))}
 
       {/* Career Quiz Section */}
-      <CareerQuiz products={products} quizData={quizData} />
+      <CareerQuiz
+        products={products}
+        quizData={quizData}
+        title={contentValue(content, 'quiz_title')}
+        description={contentValue(content, 'quiz_description')}
+        startTitle={contentValue(content, 'quiz_start_title')}
+        startDescription={contentValue(content, 'quiz_start_description')}
+        startButton={contentValue(content, 'quiz_start_button')}
+        steps={[
+          contentValue(content, 'quiz_step_one'),
+          contentValue(content, 'quiz_step_two'),
+          contentValue(content, 'quiz_step_three'),
+        ]}
+      />
 
       {/* Contact Section */}
       <ContactSection 
-        address={content.contact_address}
-        phone={content.contact_phone}
-        email={content.contact_email}
+        title={contentValue(content, 'contact_title')}
+        description={contentValue(content, 'contact_description')}
+        address={contentValue(content, 'contact_address')}
+        phone={contentValue(content, 'contact_phone')}
+        email={contentValue(content, 'contact_email')}
       />
 
-      {/* IT Industry Section */}
-      <section className="py-32 bg-gradient-to-t from-lhu-blue/5 to-transparent relative overflow-hidden">
-        <div className="container mx-auto px-4 text-center">
-            <h2 className="text-4xl font-bold mb-10 text-foreground">Sứ Mệnh & Tầm Nhìn</h2>
-            <blockquote className="text-muted max-w-4xl mx-auto text-xl italic leading-relaxed">
-              {content.it_industry_info || 'Lạc Hồng University cam kết đào tạo những kỹ sư không chỉ giỏi về kỹ năng mà còn có tư duy giải quyết vấn đề thực tiễn, đóng góp cho sự phát triển của nền kinh tế số Việt Nam.'}
-            </blockquote>
-        </div>
-      </section>
+      <MissionSection
+        title={contentValue(content, 'mission_title')}
+        content={contentValue(content, 'it_industry_info')}
+        ctaLabel={contentValue(content, 'mission_cta_label')}
+        ctaUrl={contentValue(content, 'mission_cta_url')}
+      />
     </main>
   );
 }

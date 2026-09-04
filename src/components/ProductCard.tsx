@@ -1,7 +1,10 @@
 "use client";
-import { Monitor, MessageSquare, Globe, Settings } from 'lucide-react';
+
+import { ArrowUpRight, Calendar, Code2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import CmsImage from './CmsImage';
+import ProductModal from './ProductModal';
 
 export interface Product {
   Id: number;
@@ -15,73 +18,104 @@ export interface Product {
   Author?: string;
 }
 
-import { useState } from 'react';
-import ProductModal from './ProductModal';
+interface ProductCardProps {
+  product: Product;
+  variant?: 'featured' | 'grid';
+  index?: number;
+}
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product, variant = 'grid', index = 0 }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const getIcon = (path: string) => {
-    switch (path) {
-      case 'Trí tuệ nhân tạo': return <MessageSquare size={32} />;
-      case 'Mạng máy tính': return <Globe size={32} />;
-      case 'Hệ thống IoT': return <Settings size={32} />;
-      case 'Sản phẩm phần mềm': return <Monitor size={32} />;
-      default: return <Monitor size={32} />;
-    }
-  };
+  const tags = product.TechTags.split(',').map((tag) => tag.trim()).filter(Boolean);
+
+  if (variant === 'featured') {
+    return (
+      <>
+        <motion.button
+          type="button"
+          whileHover={{ y: -3 }}
+          onClick={() => setIsModalOpen(true)}
+          className="group grid w-full overflow-hidden rounded-2xl border border-white/14 bg-[#0b1825] text-left shadow-[0_28px_80px_-42px_rgba(0,0,0,.95)] md:min-h-[31rem] md:grid-cols-[0.78fr_1.22fr]"
+          aria-label={`Xem chi tiết dự án ${product.Name}`}
+        >
+          <div className="flex flex-col p-6 sm:p-8 md:p-10">
+            <div className="flex items-start justify-between gap-5 border-b border-white/10 pb-6">
+              <span className="font-display text-5xl font-extrabold leading-none tracking-[-0.04em] text-[#d9e5ed]">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <span className="rounded-full border border-white/14 px-3 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.13em] text-[#a9bdcb]">
+                {product.CareerPath}
+              </span>
+            </div>
+
+            <div className="flex flex-1 flex-col pt-8">
+              <p className="flex items-center gap-2 text-xs font-semibold text-[#8fa6b7]">
+                <Calendar size={15} aria-hidden="true" /> {product.Year} · {product.Author || 'Sinh viên Khoa CNTT'}
+              </p>
+              <h3 className="font-display mt-5 text-3xl font-bold leading-[1.2] tracking-[-0.012em] text-white sm:text-4xl">{product.Name}</h3>
+              <p className="mt-5 line-clamp-3 text-sm leading-7 text-[#a9bdcb] sm:text-base">{product.Description}</p>
+              <div className="mt-auto flex items-end justify-between gap-5 pt-8">
+                <div className="flex flex-wrap gap-2">
+                  {tags.slice(0, 3).map((tag) => (
+                    <span key={tag} className="text-xs font-semibold text-[#84c2e6]">{tag}</span>
+                  ))}
+                </div>
+                <span className="grid size-12 shrink-0 place-items-center rounded-full bg-lhu-orange text-white transition-transform group-hover:rotate-45">
+                  <ArrowUpRight size={20} aria-hidden="true" />
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative min-h-72 overflow-hidden bg-[#050b12] md:min-h-full">
+            <CmsImage
+              src={product.ImageUrl}
+              alt={`Ảnh dự án ${product.Name}`}
+              fallbackSrc="/image-placeholder.svg"
+              sizes="(min-width: 768px) 60vw, 100vw"
+              className="object-contain p-5 transition-transform duration-700 group-hover:scale-[1.025] sm:p-8"
+            />
+            <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/7" />
+          </div>
+        </motion.button>
+        <ProductModal product={product} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      </>
+    );
+  }
 
   return (
     <>
       <motion.button
         type="button"
-        whileHover={{ y: -10 }}
+        whileHover={{ y: -5 }}
         onClick={() => setIsModalOpen(true)}
-        className="w-full h-full text-left bg-card-bg backdrop-blur-xl border border-card-border rounded-[20px] overflow-hidden flex flex-col group transition-all hover:border-lhu-orange/50 cursor-pointer shadow-lg hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lhu-orange/50"
+        className="group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-card-border bg-card-bg text-left shadow-[0_18px_46px_-34px_rgba(0,0,0,.7)] transition-colors hover:border-lhu-blue/50"
         aria-label={`Xem chi tiết dự án ${product.Name}`}
       >
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#050b12]">
           <CmsImage
             src={product.ImageUrl}
             alt={`Ảnh dự án ${product.Name}`}
             fallbackSrc="/image-placeholder.svg"
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.02] md:p-6"
+            className="object-contain p-5 transition-transform duration-500 group-hover:scale-[1.025]"
           />
-          <div className="absolute top-4 right-4 bg-lhu-blue/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white z-10">
-            {product.Year}
-          </div>
+          <span className="absolute right-4 top-4 rounded-full bg-[#07111d]/80 px-3 py-1 text-xs font-bold text-white backdrop-blur-md">{product.Year}</span>
         </div>
-        
-        <div className="p-8 flex flex-col flex-1">
-          <div className="w-14 h-14 bg-lhu-blue rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-lhu-blue/20 text-white">
-            {getIcon(product.CareerPath)}
+
+        <div className="flex flex-1 flex-col p-6">
+          <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-lhu-blue">
+            <Code2 size={15} aria-hidden="true" /> {product.CareerPath}
+          </p>
+          <h3 className="font-display mt-4 line-clamp-2 text-2xl font-bold leading-[1.25] tracking-[-0.012em] text-foreground group-hover:text-lhu-orange">{product.Name}</h3>
+          <p className="mt-4 line-clamp-3 text-sm leading-7 text-muted">{product.Description}</p>
+          <div className="mt-auto flex items-center justify-between border-t border-card-border pt-6">
+            <span className="text-xs font-semibold text-muted">{product.Author || 'Sinh viên Khoa CNTT'}</span>
+            <ArrowUpRight className="text-lhu-orange transition-transform group-hover:rotate-45" size={20} aria-hidden="true" />
           </div>
-          
-          <h3 className="text-2xl font-bold mb-2 group-hover:text-lhu-orange transition-colors text-foreground line-clamp-2 break-words">{product.Name}</h3>
-          <p className="text-muted text-xs font-bold mb-4 uppercase tracking-widest">{product.Author || 'Sinh viên Khoa CNTT'}</p>
-          <p className="text-muted text-sm mb-6 flex-1 line-clamp-3 whitespace-pre-line break-words">{product.Description}</p>
-          
-          <div className="flex flex-wrap gap-2 mb-8 h-8 overflow-hidden">
-            {product.TechTags.split(',').map((tag, i) => (
-              <span key={i} className="text-[10px] font-bold uppercase tracking-wider bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-3 py-1 rounded-full text-lhu-blue shrink-0">
-                {tag.trim()}
-              </span>
-            ))}
-          </div>
-          
-          <span
-            className="w-full py-4 rounded-2xl border border-card-border bg-card-bg text-foreground group-hover:bg-lhu-blue group-hover:text-white group-hover:border-lhu-blue transition-all text-center font-bold"
-          >
-            Xem chi tiết
-          </span>
         </div>
       </motion.button>
-
-      <ProductModal 
-        product={product} 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      <ProductModal product={product} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 }

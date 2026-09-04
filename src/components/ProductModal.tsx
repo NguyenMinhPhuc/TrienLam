@@ -1,8 +1,9 @@
 "use client";
+
 import { useEffect, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Code2, User, Calendar, Target } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ArrowUpRight, Calendar, Code2, Target, User, X } from 'lucide-react';
 import { Product } from './ProductCard';
 import CmsImage from './CmsImage';
 
@@ -17,28 +18,38 @@ interface ProductModalProps {
 export default function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
   const mounted = useSyncExternalStore(subscribeToClient, () => true, () => false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      closeButtonRef.current?.focus();
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    document.body.style.overflow = 'hidden';
+    closeButtonRef.current?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose();
-    };
+      if (event.key !== 'Tab' || !dialogRef.current) return;
 
+      const focusable = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'));
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+      previouslyFocused?.focus();
+    };
   }, [isOpen, onClose]);
 
   if (!mounted) return null;
@@ -47,125 +58,96 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
-          <motion.div
+          <motion.button
+            type="button"
+            aria-label="Đóng cửa sổ chi tiết dự án"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-background/80 backdrop-blur-md z-[99998]"
+            className="fixed inset-0 z-[99998] cursor-default bg-[#030810]/88 backdrop-blur-md"
           />
 
-          {/* Modal Container */}
-          <div className="fixed inset-0 flex items-center justify-center z-[99999] p-4 pointer-events-none">
+          <div className="pointer-events-none fixed inset-0 z-[99999] grid place-items-center p-2 sm:p-5">
             <motion.div
+              ref={dialogRef}
               role="dialog"
               aria-modal="true"
               aria-labelledby={`product-title-${product.Id}`}
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-background border border-card-border w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-[32px] shadow-2xl pointer-events-auto flex flex-col md:flex-row relative transition-colors duration-500"
+              initial={{ opacity: 0, y: 34, scale: 0.975 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.985 }}
+              transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
+              className="pointer-events-auto relative grid max-h-[94svh] w-full max-w-6xl overflow-hidden rounded-2xl border border-white/12 bg-[#07111d] text-white shadow-[0_32px_120px_-30px_rgba(0,0,0,.95)] md:grid-cols-[1.08fr_.92fr]"
             >
-              {/* Image Section */}
-              <div className="w-full md:w-1/2 h-64 md:h-auto relative bg-slate-100 dark:bg-slate-950 flex items-center justify-center p-6 transition-colors duration-500">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="w-full h-full relative"
-                >
-                  <CmsImage
-                    src={product.ImageUrl}
-                    alt={`Ảnh dự án ${product.Name}`}
-                    fallbackSrc="/image-placeholder.svg"
-                    sizes="(min-width: 768px) 50vw, 100vw"
-                    className="object-contain drop-shadow-2xl"
-                  />
-                </motion.div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent md:hidden pointer-events-none" />
+              <div className="relative min-h-64 overflow-hidden bg-[#020711] sm:min-h-80 md:min-h-[42rem]">
+                <CmsImage
+                  src={product.ImageUrl}
+                  alt={`Ảnh dự án ${product.Name}`}
+                  fallbackSrc="/image-placeholder.svg"
+                  sizes="(min-width: 768px) 55vw, 100vw"
+                  className="object-contain p-5 sm:p-9"
+                />
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/6" />
               </div>
 
-              {/* Content Section */}
-              <div className="w-full md:w-1/2 p-8 md:p-12 overflow-y-auto bg-background">
-                <button 
+              <div className="max-h-[58svh] overflow-y-auto p-6 sm:p-9 md:max-h-[94svh] md:p-12">
+                <button
                   ref={closeButtonRef}
+                  type="button"
                   onClick={onClose}
                   aria-label="Đóng cửa sổ chi tiết dự án"
-                  className="absolute top-6 right-6 p-2 bg-card-bg hover:bg-black/5 dark:hover:bg-white/10 rounded-full transition-colors text-foreground"
+                  className="absolute right-4 top-4 z-10 grid size-11 place-items-center rounded-full border border-white/12 bg-[#0c1824]/90 text-white transition hover:rotate-90 hover:bg-white/10 sm:right-6 sm:top-6"
                 >
-                  <X size={24} />
+                  <X size={21} />
                 </button>
 
-                <div className="flex items-center gap-3 mb-6">
-                  <span className="bg-lhu-blue/10 dark:bg-lhu-blue/20 text-lhu-blue px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
-                    {product.CareerPath}
-                  </span>
-                  <span className="text-muted text-sm flex items-center gap-1">
-                    <Calendar size={14} /> {product.Year}
-                  </span>
+                <div className="flex flex-wrap items-center gap-3 pr-12">
+                  <span className="rounded-full bg-lhu-blue/16 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.1em] text-[#84c7ed]">{product.CareerPath}</span>
+                  <span className="flex items-center gap-1.5 text-sm text-[#91a7b8]"><Calendar size={14} aria-hidden="true" /> {product.Year}</span>
                 </div>
 
-                <h2 id={`product-title-${product.Id}`} className="text-3xl md:text-4xl font-black mb-6 leading-tight text-foreground">{product.Name}</h2>
+                <h2 id={`product-title-${product.Id}`} className="font-display mt-7 text-3xl font-bold leading-[1.22] tracking-[-0.01em] sm:text-4xl">{product.Name}</h2>
 
-                <div className="space-y-8">
-                   {/* Author */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-card-bg flex items-center justify-center flex-shrink-0 border border-card-border">
-                      <User size={20} className="text-lhu-orange" />
-                    </div>
+                <dl className="mt-10 divide-y divide-white/9 border-y border-white/9">
+                  <div className="grid grid-cols-[2.5rem_1fr] gap-4 py-6">
+                    <User className="mt-1 text-lhu-orange" size={21} aria-hidden="true" />
                     <div>
-                      <h4 className="text-sm font-bold text-muted uppercase tracking-wider mb-1">Tác giả</h4>
-                      <p className="text-lg font-medium text-foreground">{product.Author || 'Sinh viên Khoa CNTT'}</p>
+                      <dt className="text-xs font-bold uppercase tracking-[0.12em] text-[#8197a9]">Tác giả</dt>
+                      <dd className="mt-2 font-semibold text-white">{product.Author || 'Sinh viên Khoa CNTT'}</dd>
                     </div>
                   </div>
-
-                  {/* Description */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-card-bg flex items-center justify-center flex-shrink-0 border border-card-border">
-                      <Target size={20} className="text-lhu-blue" />
-                    </div>
+                  <div className="grid grid-cols-[2.5rem_1fr] gap-4 py-6">
+                    <Target className="mt-1 text-lhu-blue" size={21} aria-hidden="true" />
                     <div>
-                      <h4 className="text-sm font-bold text-muted uppercase tracking-wider mb-1">Chi tiết dự án</h4>
-                      <p className="text-muted leading-relaxed whitespace-pre-line break-words">{product.Description}</p>
+                      <dt className="text-xs font-bold uppercase tracking-[0.12em] text-[#8197a9]">Chi tiết dự án</dt>
+                      <dd className="prose-copy mt-3 whitespace-pre-line text-sm leading-7 text-[#afc0cd]">{product.Description}</dd>
                     </div>
                   </div>
-
-                  {/* Technologies */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-full bg-card-bg flex items-center justify-center flex-shrink-0 border border-card-border">
-                      <Code2 size={20} className="text-lhu-orange" />
-                    </div>
+                  <div className="grid grid-cols-[2.5rem_1fr] gap-4 py-6">
+                    <Code2 className="mt-1 text-lhu-orange" size={21} aria-hidden="true" />
                     <div>
-                      <h4 className="text-sm font-bold text-muted uppercase tracking-wider mb-2">Công nghệ sử dụng</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {product.TechTags.split(',').map((tag, i) => (
-                          <span key={i} className="px-3 py-1 bg-card-bg border border-card-border rounded-lg text-xs font-medium text-foreground">
-                            {tag.trim()}
-                          </span>
+                      <dt className="text-xs font-bold uppercase tracking-[0.12em] text-[#8197a9]">Công nghệ sử dụng</dt>
+                      <dd className="mt-3 flex flex-wrap gap-2">
+                        {product.TechTags.split(',').map((tag) => (
+                          <span key={tag} className="rounded-full border border-white/12 px-3 py-1.5 text-xs font-semibold text-[#c7d4dd]">{tag.trim()}</span>
                         ))}
-                      </div>
+                      </dd>
                     </div>
                   </div>
-                </div>
+                </dl>
 
-                <div className="mt-12">
-                  <a 
-                    href={product.AppUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="w-full py-5 bg-lhu-orange hover:bg-lhu-orange/90 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all transform hover:scale-[1.02]"
-                  >
-                    <ExternalLink size={20} />
-                    Trải nghiệm ứng dụng
+                {product.AppUrl && (
+                  <a href={product.AppUrl} target="_blank" rel="noopener noreferrer" className="button-primary mt-9 w-full">
+                    Trải nghiệm ứng dụng <ArrowUpRight size={19} aria-hidden="true" />
                   </a>
-                </div>
+                )}
               </div>
             </motion.div>
           </div>
         </>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }

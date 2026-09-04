@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { execute } from '@/lib/db';
+import { revalidatePath } from 'next/cache';
+
+function revalidateSections() {
+  revalidatePath('/');
+  revalidatePath('/academic');
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -23,6 +29,8 @@ export async function POST(req: NextRequest) {
       { Title, Subtitle, LayoutType, ContentJson, BgStyle, OrderIndex, IsActive: IsActive ? 1 : 0, PageKey: PageKey || 'home' }
     );
 
+    revalidateSections();
+
     return NextResponse.json({ message: 'Section created successfully' });
   } catch (err) {
     console.error('Insert Error:', err);
@@ -42,6 +50,8 @@ export async function PUT(req: NextRequest) {
       { Id: parseInt(Id), Title, Subtitle, LayoutType, ContentJson, BgStyle, OrderIndex, IsActive: IsActive ? 1 : 0, PageKey: PageKey || 'home' }
     );
 
+    revalidateSections();
+
     return NextResponse.json({ message: 'Section updated successfully' });
   } catch (err) {
     console.error('Update Error:', err);
@@ -57,6 +67,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'Id required' }, { status: 400 });
 
     await execute('DELETE FROM CustomSections WHERE Id = @id', { id: parseInt(id) });
+    revalidateSections();
     return NextResponse.json({ message: 'Section deleted successfully' });
   } catch (err) {
     console.error('Delete Error:', err);

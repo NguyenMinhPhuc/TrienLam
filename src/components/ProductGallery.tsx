@@ -1,8 +1,9 @@
 "use client";
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { Cpu, Globe, LayoutGrid, Monitor, Settings } from 'lucide-react';
+import { useRef, useState } from 'react';
 import ProductCard, { Product } from './ProductCard';
-import { LayoutGrid, Globe, Settings, Cpu, Monitor } from 'lucide-react';
 
 interface ProductGalleryProps {
   products: Product[];
@@ -16,78 +17,84 @@ const categories = [
   { id: 'Trí tuệ nhân tạo', name: 'Trí tuệ nhân tạo', icon: Cpu },
 ];
 
-export default function ProductGallery({ products }: ProductGalleryProps) {
-  const [activeTab, setActiveTab] = useState('all');
-
-  const filteredProducts = activeTab === 'all' 
-    ? products 
-    : products.filter(p => p.CareerPath === activeTab);
+function FeaturedProject({ product, index }: { product: Product; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 25%', 'end 25%'] });
+  const scale = useTransform(scrollYProgress, [0, 1], [1, reduceMotion ? 1 : 0.965]);
+  const opacity = useTransform(scrollYProgress, [0, 0.86, 1], [1, 1, reduceMotion ? 1 : 0.86]);
 
   return (
-    <div className="space-y-16">
-      {/* Tabs Control */}
-      <div aria-label="Lọc sản phẩm theo lĩnh vực" className="flex flex-wrap justify-center gap-4">
-        {categories.map((cat) => (
-          <button
-            type="button"
-            key={cat.id}
-            onClick={() => setActiveTab(cat.id)}
-            aria-pressed={activeTab === cat.id}
-            className={`
-              flex items-center gap-3 px-6 py-3 rounded-2xl font-bold transition-all relative
-              ${activeTab === cat.id 
-                ? 'text-white' 
-                : 'text-slate-500 hover:text-lhu-blue bg-white/5 border border-white/5 hover:border-lhu-blue/30'}
-            `}
-          >
-            {activeTab === cat.id && (
-              <motion.div 
-                layoutId="activeTabBg"
-                className="absolute inset-0 bg-lhu-blue rounded-2xl shadow-xl shadow-lhu-blue/20 -z-10"
-                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
-              />
-            )}
-            <cat.icon size={18} />
-            <span className="whitespace-nowrap">{cat.name}</span>
-          </button>
-        ))}
+    <motion.div
+      ref={ref}
+      style={{ scale, opacity, top: 96 + index * 10 }}
+      className="relative mb-6 origin-top md:sticky md:mb-14"
+    >
+      <ProductCard product={product} variant="featured" index={index} />
+    </motion.div>
+  );
+}
+
+export default function ProductGallery({ products }: ProductGalleryProps) {
+  const [activeTab, setActiveTab] = useState('all');
+  const filteredProducts = activeTab === 'all' ? products : products.filter((product) => product.CareerPath === activeTab);
+  const featured = filteredProducts.slice(0, 3);
+  const remaining = filteredProducts.slice(3);
+
+  return (
+    <div>
+      <div aria-label="Lọc sản phẩm theo lĩnh vực" className="mb-12 flex gap-2 overflow-x-auto pb-3 md:flex-wrap">
+        {categories.map((category) => {
+          const active = activeTab === category.id;
+          return (
+            <button
+              type="button"
+              key={category.id}
+              onClick={() => setActiveTab(category.id)}
+              aria-pressed={active}
+              className={`relative flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? 'text-[#07111d]' : 'border border-white/12 text-[#b7c8d5] hover:border-lhu-blue/70 hover:text-white'}`}
+            >
+              {active && <motion.span layoutId="active-product-filter" className="absolute inset-0 rounded-full bg-[#a9d6ef]" transition={{ type: 'spring', bounce: 0.16, duration: 0.5 }} />}
+              <category.icon className="relative z-10" size={16} aria-hidden="true" />
+              <span className="relative z-10">{category.name}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Products Grid */}
-      <motion.div
-        aria-live="polite"
-        layout
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
-      >
-        <AnimatePresence mode='popLayout'>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.3 }}
+          aria-live="polite"
+        >
           {filteredProducts.length > 0 ? (
-            filteredProducts.map((product) => (
-              <motion.div
-                key={product.Id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))
-          ) : (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="col-span-full py-24 text-center bg-card-bg rounded-[32px] border border-dashed border-card-border"
-            >
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-500">
-                <Cpu size={32} />
+            <>
+              <div>
+                {featured.map((product, index) => <FeaturedProject key={product.Id} product={product} index={index} />)}
               </div>
-              <p className="text-muted text-xl font-medium">Hiện chưa có sản phẩm nào trong mục này.</p>
-              <p className="text-slate-500 mt-2 text-sm">Chúng tôi đang cập nhật các dự án mới nhất của sinh viên.</p>
-            </motion.div>
+
+              {remaining.length > 0 && (
+                <div className="mt-8 border-t border-white/10 pt-16">
+                  <h3 className="font-display mb-9 text-2xl font-bold tracking-[-0.012em] text-white">Khám phá thêm dự án</h3>
+                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {remaining.map((product) => <ProductCard key={product.Id} product={product} />)}
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-white/16 bg-white/4 px-6 py-20 text-center">
+              <Cpu className="mx-auto text-lhu-blue" size={36} aria-hidden="true" />
+              <p className="font-display mt-6 text-2xl font-semibold text-white">Danh mục này đang được cập nhật.</p>
+              <p className="mt-3 text-sm text-[#9eb1c1]">Hãy thử một lĩnh vực khác hoặc quay lại sau.</p>
+            </div>
           )}
-        </AnimatePresence>
-      </motion.div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

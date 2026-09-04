@@ -10,7 +10,8 @@ import {
   EyeOff, 
   ChevronUp, 
   ChevronDown,
-  Layout
+  Layout,
+  ImagePlus
 } from 'lucide-react';
 import DynamicIcon from '@/components/DynamicIcon';
 
@@ -34,6 +35,10 @@ interface SectionContentItem {
   id?: string;
   containerId?: string;
   botId?: string;
+  image?: string;
+  imageAlt?: string;
+  linkLabel?: string;
+  linkUrl?: string;
 }
 
 const ICON_OPTIONS = [
@@ -83,9 +88,16 @@ function SectionPreview({ contentJson, layoutType }: { contentJson: string; layo
     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {items.slice(0, 4).map((item, index) => (
         <div key={index} className="p-3 bg-white/5 border border-white/5 rounded-lg flex items-start gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue shrink-0">
-            <DynamicIcon name={item.icon} size={16} />
-          </div>
+          {item.image ? (
+            <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-slate-950">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={item.image} alt="" className="h-full w-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-10 h-10 rounded-md bg-lhu-blue/10 flex items-center justify-center text-lhu-blue shrink-0">
+              <DynamicIcon name={item.icon} size={16} />
+            </div>
+          )}
           <div className="min-w-0">
             <div className="text-sm font-bold text-white line-clamp-1">{item.title || 'Tiêu đề'}</div>
             <div className="text-xs text-slate-400 line-clamp-2">{item.body || ''}</div>
@@ -120,6 +132,7 @@ export default function SectionsManager() {
 
   const [editorMode, setEditorMode] = useState<'visual' | 'raw'>('visual');
   const [contentItems, setContentItems] = useState<SectionContentItem[]>([]);
+  const [uploadingItem, setUploadingItem] = useState<number | null>(null);
 
   // Helpers for visual editor
   const syncJson = (items: SectionContentItem[]) => {
@@ -151,6 +164,28 @@ export default function SectionsManager() {
     [newItems[index], newItems[newIndex]] = [newItems[newIndex], newItems[index]];
     setContentItems(newItems);
     syncJson(newItems);
+  };
+
+  const uploadItemImage = async (index: number, file: File) => {
+    setUploadingItem(index);
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body,
+        credentials: 'include',
+      });
+      const result = await response.json();
+      if (!response.ok || !result.url) {
+        throw new Error(result.error || 'Không thể tải ảnh lên.');
+      }
+      updateItem(index, 'image', result.url);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Không thể tải ảnh lên.');
+    } finally {
+      setUploadingItem(null);
+    }
   };
 
   const fetchSections = async (page: string) => {
@@ -583,6 +618,70 @@ export default function SectionsManager() {
                                                >
                                                   <Trash2 size={18} />
                                                </button>
+                                            </div>
+                                         </div>
+
+                                         <div className="mt-6 grid grid-cols-1 gap-5 border-t border-white/10 pt-6 md:grid-cols-2">
+                                            <div className="space-y-2">
+                                               <label htmlFor={`section-item-image-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Ảnh minh họa</label>
+                                               <div className="flex gap-2">
+                                                  <input
+                                                     id={`section-item-image-${index}`}
+                                                     type="text"
+                                                     value={item.image || ''}
+                                                     onChange={(e) => updateItem(index, 'image', e.target.value)}
+                                                     className="min-w-0 flex-1 p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue"
+                                                     placeholder="/uploads/anh.jpg hoặc URL"
+                                                  />
+                                                  <label className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-xl border border-white/10 bg-slate-800 text-slate-300 hover:border-lhu-blue hover:text-white" title="Tải ảnh từ máy tính">
+                                                     {uploadingItem === index ? <span className="size-4 animate-spin rounded-full border-2 border-white/20 border-t-white" /> : <ImagePlus size={18} aria-hidden="true" />}
+                                                     <span className="sr-only">Tải ảnh cho thành phần {index + 1}</span>
+                                                     <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="hidden"
+                                                        disabled={uploadingItem === index}
+                                                        onChange={(event) => {
+                                                          const file = event.target.files?.[0];
+                                                          if (file) void uploadItemImage(index, file);
+                                                          event.target.value = '';
+                                                        }}
+                                                     />
+                                                  </label>
+                                               </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                               <label htmlFor={`section-item-image-alt-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Mô tả ảnh</label>
+                                               <input
+                                                  id={`section-item-image-alt-${index}`}
+                                                  type="text"
+                                                  value={item.imageAlt || ''}
+                                                  onChange={(e) => updateItem(index, 'imageAlt', e.target.value)}
+                                                  className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue"
+                                                  placeholder="Mô tả ngắn nội dung ảnh"
+                                               />
+                                            </div>
+                                            <div className="space-y-2">
+                                               <label htmlFor={`section-item-link-label-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Nhãn liên kết</label>
+                                               <input
+                                                  id={`section-item-link-label-${index}`}
+                                                  type="text"
+                                                  value={item.linkLabel || ''}
+                                                  onChange={(e) => updateItem(index, 'linkLabel', e.target.value)}
+                                                  className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue"
+                                                  placeholder="Ví dụ: Tìm hiểu thêm"
+                                               />
+                                            </div>
+                                            <div className="space-y-2">
+                                               <label htmlFor={`section-item-link-url-${index}`} className="text-[10px] font-bold text-slate-600 uppercase ml-1">Đường dẫn</label>
+                                               <input
+                                                  id={`section-item-link-url-${index}`}
+                                                  type="text"
+                                                  value={item.linkUrl || ''}
+                                                  onChange={(e) => updateItem(index, 'linkUrl', e.target.value)}
+                                                  className="w-full p-3 bg-slate-950/50 border border-white/10 rounded-xl text-white text-xs outline-none focus:border-lhu-blue"
+                                                  placeholder="https://... hoặc /duong-dan"
+                                               />
                                             </div>
                                          </div>
 

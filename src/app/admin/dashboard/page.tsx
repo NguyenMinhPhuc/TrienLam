@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                        <div className="relative w-12 h-12 rounded-xl bg-slate-800 overflow-hidden flex-shrink-0 border border-white/10">
-                          <CmsImage src={p.ImageUrl} alt={`Ảnh dự án ${p.Name}`} sizes="48px" className="object-cover" />
+                           <CmsImage src={p.ImageUrl} alt={`Ảnh dự án ${p.Name}`} sizes="48px" className="object-contain p-1" />
                       </div>
                       <span className="font-bold text-lg text-white group-hover:text-lhu-orange transition-colors">{p.Name}</span>
                     </div>

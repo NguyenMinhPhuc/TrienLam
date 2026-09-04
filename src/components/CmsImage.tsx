@@ -12,7 +12,7 @@ interface CmsImageProps {
   preload?: boolean;
 }
 
-const DEFAULT_FALLBACK = '/window.svg';
+const DEFAULT_FALLBACK = '/image-placeholder.svg';
 
 export default function CmsImage({
   src,

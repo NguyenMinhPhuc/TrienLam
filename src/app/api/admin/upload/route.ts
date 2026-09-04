@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
 
     await writeFile(uploadPath, buffer);
 
-    // Return the URL using out new dynamic route
-    const fileUrl = `/api/uploads/${fileName}`;
+    // Files in public/uploads are served directly by Next.js.
+    const fileUrl = `/uploads/${fileName}`;
     return NextResponse.json({ url: fileUrl });
   } catch (err) {
     console.error('Upload Error:', err);

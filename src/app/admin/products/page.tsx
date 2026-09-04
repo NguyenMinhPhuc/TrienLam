@@ -172,7 +172,7 @@ export default function ProductsManager() {
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0 border border-white/10">
-                        <CmsImage src={p.ImageUrl} alt={`Ảnh dự án ${p.Name}`} sizes="56px" className="object-cover" />
+                         <CmsImage src={p.ImageUrl} alt={`Ảnh dự án ${p.Name}`} sizes="56px" className="object-contain p-1" />
                       </div>
                       <div>
                         <p className="font-bold text-lg text-white group-hover:text-lhu-orange transition-colors">{p.Name}</p>
@@ -308,16 +308,16 @@ export default function ProductsManager() {
                        <div className="w-full md:w-48 h-32 rounded-2xl border-2 border-dashed border-white/10 bg-white/5 overflow-hidden flex items-center justify-center relative group">
                           {formData.ImageUrl ? (
                              <>
-                               <CmsImage src={formData.ImageUrl} alt="Xem trước ảnh dự án" sizes="192px" className="object-cover" />
-                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                  <label className="cursor-pointer p-2 bg-white/20 rounded-full text-white"><span className="sr-only">Thay ảnh dự án</span><Edit2 size={16} /><input type="file" className="hidden" accept="image/*" onChange={handleUpload}/></label>
+                               <CmsImage src={formData.ImageUrl} alt="Xem trước ảnh dự án" sizes="192px" className="object-contain p-2" />
+                               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity flex items-center justify-center">
+                                  <label className="cursor-pointer p-2 bg-white/20 rounded-full text-white"><span className="sr-only">Thay ảnh dự án</span><Edit2 size={16} /><input type="file" className="sr-only" accept="image/*" onChange={handleUpload}/></label>
                                </div>
                              </>
                           ) : (
                              <label className="cursor-pointer flex flex-col items-center gap-2 text-slate-500 hover:text-white transition-colors">
                                 <Upload size={24} />
                                 <span className="text-[10px] font-bold">TẢI ẢNH LÊN</span>
-                                <input type="file" className="hidden" accept="image/*" onChange={handleUpload}/>
+                                <input type="file" className="sr-only" accept="image/*" onChange={handleUpload}/>
                              </label>
                           )}
                           {isUploading && <div className="absolute inset-0 bg-slate-950/80 flex items-center justify-center"><div className="w-6 h-6 border-2 border-lhu-blue border-t-transparent rounded-full animate-spin"></div></div>}

@@ -39,13 +39,13 @@ export default function ProductCard({ product }: { product: Product }) {
         className="w-full h-full text-left bg-card-bg backdrop-blur-xl border border-card-border rounded-[20px] overflow-hidden flex flex-col group transition-all hover:border-lhu-orange/50 cursor-pointer shadow-lg hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-lhu-orange/50"
         aria-label={`Xem chi tiết dự án ${product.Name}`}
       >
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-950 flex items-center justify-center">
           <CmsImage
             src={product.ImageUrl}
             alt={`Ảnh dự án ${product.Name}`}
-            fallbackSrc="/window.svg"
+            fallbackSrc="/image-placeholder.svg"
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform group-hover:scale-105"
+            className="object-contain p-4 transition-transform duration-300 group-hover:scale-[1.02] md:p-6"
           />
           <div className="absolute top-4 right-4 bg-lhu-blue/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold text-white z-10">
             {product.Year}
@@ -57,9 +57,9 @@ export default function ProductCard({ product }: { product: Product }) {
             {getIcon(product.CareerPath)}
           </div>
           
-          <h3 className="text-2xl font-bold mb-2 group-hover:text-lhu-orange transition-colors text-foreground line-clamp-1">{product.Name}</h3>
+          <h3 className="text-2xl font-bold mb-2 group-hover:text-lhu-orange transition-colors text-foreground line-clamp-2 break-words">{product.Name}</h3>
           <p className="text-muted text-xs font-bold mb-4 uppercase tracking-widest">{product.Author || 'Sinh viên Khoa CNTT'}</p>
-          <p className="text-muted text-sm mb-6 flex-1 line-clamp-1">{product.Description}</p>
+          <p className="text-muted text-sm mb-6 flex-1 line-clamp-3 whitespace-pre-line break-words">{product.Description}</p>
           
           <div className="flex flex-wrap gap-2 mb-8 h-8 overflow-hidden">
             {product.TechTags.split(',').map((tag, i) => (

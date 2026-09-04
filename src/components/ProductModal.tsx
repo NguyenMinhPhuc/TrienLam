@@ -78,7 +78,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   <CmsImage
                     src={product.ImageUrl}
                     alt={`Ảnh dự án ${product.Name}`}
-                    fallbackSrc="/window.svg"
+                    fallbackSrc="/image-placeholder.svg"
                     sizes="(min-width: 768px) 50vw, 100vw"
                     className="object-contain drop-shadow-2xl"
                   />
@@ -127,7 +127,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-muted uppercase tracking-wider mb-1">Chi tiết dự án</h4>
-                      <p className="text-muted leading-relaxed">{product.Description}</p>
+                      <p className="text-muted leading-relaxed whitespace-pre-line break-words">{product.Description}</p>
                     </div>
                   </div>
 

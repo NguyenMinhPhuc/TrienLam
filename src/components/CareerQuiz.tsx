@@ -191,7 +191,7 @@ export default function CareerQuiz({ products, quizData }: CareerQuizProps) {
                     <p className="text-xs font-bold text-lhu-blue uppercase tracking-widest mb-4">Dự án sinh viên dành cho bạn:</p>
                     <div className="flex gap-6 items-center">
                       <div className="relative w-24 h-24 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/10 flex-shrink-0">
-                         <CmsImage src={recommendedProduct.ImageUrl} alt={`Ảnh dự án ${recommendedProduct.Name}`} sizes="96px" className="object-cover" />
+                         <CmsImage src={recommendedProduct.ImageUrl} alt={`Ảnh dự án ${recommendedProduct.Name}`} sizes="96px" className="object-contain p-2" />
                       </div>
                       <div>
                         <h4 className="text-2xl font-bold mb-2 text-foreground">{recommendedProduct.Name}</h4>

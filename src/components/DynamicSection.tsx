@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, ChevronDown } from 'lucide-react';
 import Script from 'next/script';
 import { useState } from 'react';
@@ -102,6 +102,7 @@ export default function DynamicSection({
   products = [],
 }: DynamicSectionProps) {
   const [openIndex, setOpenIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
   let items: ContentItem[] = [];
 
   try {
@@ -231,6 +232,15 @@ export default function DynamicSection({
                       <ChevronDown size={17} aria-hidden="true" />
                     </motion.span>
                   </button>
+                  {isOpen && !reduceMotion && (
+                    <motion.span
+                      aria-hidden="true"
+                      initial={{ opacity: 0, backgroundPosition: '0% 50%' }}
+                      animate={{ opacity: [0, 1, 0], backgroundPosition: ['0% 50%', '100% 50%'] }}
+                      transition={{ duration: 1.05, ease: [0.22, 1, 0.36, 1] }}
+                      className="accordion-border-beam"
+                    />
+                  )}
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div

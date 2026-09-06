@@ -80,7 +80,11 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               transition={{ duration: 0.36, ease: [0.22, 1, 0.36, 1] }}
               className="public-content pointer-events-auto relative grid max-h-[94svh] w-full max-w-6xl overflow-hidden rounded-2xl border border-card-border dark:border-white/12 bg-card-bg dark:bg-[#07111d] text-foreground dark:text-white shadow-[0_32px_100px_-30px_rgba(8,31,50,.28)] dark:shadow-[0_32px_120px_-30px_rgba(0,0,0,.95)] md:grid-cols-[1.08fr_.92fr]"
             >
-              <div className="relative min-h-64 overflow-hidden bg-public-media dark:bg-[#020711] sm:min-h-80 md:min-h-[42rem]">
+              <motion.div
+                layoutId={`product-image-${product.Id}`}
+                transition={{ layout: { duration: 0.48, ease: [0.22, 1, 0.36, 1] } }}
+                className="relative min-h-64 overflow-hidden bg-public-media dark:bg-[#020711] sm:min-h-80 md:min-h-[42rem]"
+              >
                 <CmsImage
                   src={product.ImageUrl}
                   alt={`Ảnh dự án ${product.Name}`}
@@ -89,7 +93,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   className="object-contain p-5 sm:p-9"
                 />
                 <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-card-border dark:ring-white/6" />
-              </div>
+              </motion.div>
 
               <div className="max-h-[58svh] overflow-y-auto p-6 sm:p-9 md:max-h-[94svh] md:p-12">
                 <button

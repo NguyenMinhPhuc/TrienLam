@@ -92,6 +92,14 @@ export default function FacultySection({
               sizes="(min-width: 1024px) 66vw, 100vw"
               className="object-cover transition-transform duration-700 hover:scale-[1.02]"
             />
+            <motion.span
+              aria-hidden="true"
+              initial={reduceMotion ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+              whileInView={{ opacity: 0, scaleX: 0 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: reduceMotion ? 0 : 0.72, delay: reduceMotion ? 0 : 0.2, ease }}
+              className="faculty-reveal-block pointer-events-none absolute inset-0 z-20 origin-left opacity-0"
+            />
             <div className="absolute inset-x-0 bottom-0 flex items-end justify-between bg-gradient-to-t from-[#07111d]/95 via-[#07111d]/45 to-transparent p-6 pt-28 sm:p-8">
               <p className="max-w-sm font-display text-xl font-semibold text-white sm:text-2xl">{mediaCaption}</p>
               <span className="hidden rounded-full border border-white/20 bg-[#07111d]/55 px-4 py-2 text-xs font-semibold text-[#cfdae3] backdrop-blur-md sm:block">{mediaLocation}</span>

@@ -329,6 +329,25 @@ a {
   background: radial-gradient(420px circle at var(--spot-x) var(--spot-y), rgba(var(--lhu-blue-rgb), 0.12), transparent 55%);
 }
 
+.accordion-border-beam {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, transparent 12%, var(--public-blue) 43%, var(--public-orange) 57%, transparent 88%);
+  background-size: 220% 220%;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+}
+
+.faculty-reveal-block {
+  background: linear-gradient(105deg, var(--public-blue) 0%, color-mix(in srgb, var(--public-blue) 72%, var(--public-orange)) 52%, var(--public-orange) 100%);
+}
+
 .line-clamp-2 {
   display: -webkit-box;
   overflow: hidden;

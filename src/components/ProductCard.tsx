@@ -67,7 +67,11 @@ export default function ProductCard({ product, variant = 'grid', index = 0 }: Pr
             </div>
           </div>
 
-          <div className="relative min-h-72 overflow-hidden bg-public-media md:min-h-full">
+          <motion.div
+            layoutId={`product-image-${product.Id}`}
+            transition={{ layout: { duration: 0.48, ease: [0.22, 1, 0.36, 1] } }}
+            className="relative min-h-72 overflow-hidden bg-public-media md:min-h-full"
+          >
             <CmsImage
               src={product.ImageUrl}
               alt={`Ảnh dự án ${product.Name}`}
@@ -76,7 +80,7 @@ export default function ProductCard({ product, variant = 'grid', index = 0 }: Pr
               className="object-contain p-5 transition-transform duration-700 group-hover:scale-[1.025] sm:p-8"
             />
             <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-card-border dark:ring-white/7" />
-          </div>
+          </motion.div>
         </motion.button>
         <ProductModal product={product} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </>
@@ -92,7 +96,11 @@ export default function ProductCard({ product, variant = 'grid', index = 0 }: Pr
         className="public-content group flex h-full w-full flex-col overflow-hidden rounded-2xl border border-card-border bg-card-bg text-left shadow-[var(--public-shadow)] dark:shadow-[0_18px_46px_-34px_rgba(0,0,0,.7)] transition-colors hover:border-lhu-blue/50"
         aria-label={`Xem chi tiết dự án ${product.Name}`}
       >
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-public-media">
+        <motion.div
+          layoutId={`product-image-${product.Id}`}
+          transition={{ layout: { duration: 0.48, ease: [0.22, 1, 0.36, 1] } }}
+          className="relative aspect-[16/10] w-full overflow-hidden bg-public-media"
+        >
           <CmsImage
             src={product.ImageUrl}
             alt={`Ảnh dự án ${product.Name}`}
@@ -101,7 +109,7 @@ export default function ProductCard({ product, variant = 'grid', index = 0 }: Pr
             className="object-contain p-5 transition-transform duration-500 group-hover:scale-[1.025]"
           />
           <span className="absolute right-4 top-4 rounded-full bg-white/90 dark:bg-[#07111d]/80 px-3 py-1 text-xs font-bold text-foreground dark:text-white backdrop-blur-md">{product.Year}</span>
-        </div>
+        </motion.div>
 
         <div className="flex flex-1 flex-col p-6">
           <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-public-blue">

@@ -37,6 +37,10 @@ interface StatsSectionProps {
 }
 
 export default function StatsSection({ stats, title, description }: StatsSectionProps) {
+  const signalRef = useRef<HTMLDivElement>(null);
+  const signalInView = useInView(signalRef, { once: true, margin: '-80px' });
+  const reduceMotion = useReducedMotion();
+
   return (
     <section id="stats" className="public-content section-pad blueprint-surface relative overflow-hidden border-y border-card-border">
       <div className="site-shell relative z-10 grid items-center gap-14 lg:grid-cols-[0.82fr_1.18fr] lg:gap-20">
@@ -52,18 +56,44 @@ export default function StatsSection({ stats, title, description }: StatsSection
           </p>
           <div className="signal-line mt-9" aria-hidden="true" />
 
-          <div className="relative mt-12 hidden aspect-[5/3] max-w-lg overflow-hidden rounded-2xl border border-card-border bg-[var(--surface-2)] dark:bg-[#07111d] lg:block" aria-hidden="true">
+          <div ref={signalRef} className="relative mt-12 hidden aspect-[5/3] max-w-lg overflow-hidden rounded-2xl border border-card-border bg-[var(--surface-2)] dark:bg-[#07111d] lg:block" aria-hidden="true">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_35%,rgba(35,133,193,.34),transparent_32%),radial-gradient(circle_at_72%_68%,rgba(243,112,33,.2),transparent_25%)]" />
-            <svg viewBox="0 0 560 330" className="absolute inset-0 size-full opacity-80">
-              <path d="M35 220 C130 80 205 270 300 125 S455 95 530 42" fill="none" stroke="var(--public-signal-blue)" strokeWidth="1.5" />
-              <path d="M20 270 C120 240 160 100 270 175 S420 285 540 215" fill="none" stroke="var(--public-signal-orange)" strokeWidth="1.5" />
+            <motion.svg viewBox="0 0 560 330" className="absolute inset-0 size-full opacity-80">
+              <motion.path
+                d="M35 220 C130 80 205 270 300 125 S455 95 530 42"
+                fill="none"
+                stroke="var(--public-signal-blue)"
+                strokeWidth="1.5"
+                initial={reduceMotion ? false : { pathLength: 0, opacity: 0.35 }}
+                animate={signalInView ? { pathLength: 1, opacity: 1 } : undefined}
+                transition={{ duration: reduceMotion ? 0 : 1.15, ease: [0.22, 1, 0.36, 1] }}
+              />
+              <motion.path
+                d="M20 270 C120 240 160 100 270 175 S420 285 540 215"
+                fill="none"
+                stroke="var(--public-signal-orange)"
+                strokeWidth="1.5"
+                initial={reduceMotion ? false : { pathLength: 0, opacity: 0.35 }}
+                animate={signalInView ? { pathLength: 1, opacity: 1 } : undefined}
+                transition={{ duration: reduceMotion ? 0 : 1.15, delay: reduceMotion ? 0 : 0.16, ease: [0.22, 1, 0.36, 1] }}
+              />
+              {signalInView && !reduceMotion && (
+                <>
+                  <circle r="4" fill="#66b9e8">
+                    <animateMotion path="M35 220 C130 80 205 270 300 125 S455 95 530 42" dur="2.8s" begin="0.25s" fill="freeze" />
+                  </circle>
+                  <circle r="4" fill="#f37021">
+                    <animateMotion path="M20 270 C120 240 160 100 270 175 S420 285 540 215" dur="2.8s" begin="0.45s" fill="freeze" />
+                  </circle>
+                </>
+              )}
               {[80, 180, 280, 390, 495].map((x, index) => (
                 <g key={x}>
                   <circle cx={x} cy={[190, 112, 184, 126, 72][index]} r="8" fill={index % 2 ? '#f37021' : '#2385c1'} />
                   <circle cx={x} cy={[190, 112, 184, 126, 72][index]} r="18" fill="none" stroke="var(--public-signal-ring)" />
                 </g>
               ))}
-            </svg>
+            </motion.svg>
             <p className="absolute bottom-5 left-6 text-xs font-semibold uppercase tracking-[0.18em] text-muted dark:text-[#91a8ba]">Learning signal / LHU</p>
           </div>
         </motion.div>

@@ -27,6 +27,29 @@ const RESULT_CAREER_PATHS: Record<string, string[]> = {
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
+function QuizStageRail({ steps, currentStage }: { steps: [string, string, string]; currentStage: number }) {
+  return (
+    <div className="mt-10 grid grid-cols-3 gap-2" aria-label="Tiến trình trắc nghiệm" role="list">
+      {steps.map((label, index) => {
+        const complete = index <= currentStage;
+        return (
+          <div key={label} role="listitem" aria-current={index === currentStage ? 'step' : undefined}>
+            <div className="h-1 overflow-hidden rounded-full bg-card-border">
+              <motion.span
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: complete ? 1 : 0 }}
+                transition={{ duration: 0.42, delay: index * 0.06, ease }}
+                className="block h-full origin-left rounded-full bg-public-orange"
+              />
+            </div>
+            <span className={`mt-2 block truncate text-[0.65rem] font-semibold uppercase tracking-[0.08em] ${complete ? 'text-foreground' : 'text-muted'}`}>{label}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function CareerQuiz({
   products,
   quizData,
@@ -159,6 +182,7 @@ export default function CareerQuiz({
                         className="h-full bg-lhu-orange"
                       />
                     </div>
+                    <QuizStageRail steps={steps} currentStage={1} />
                   </div>
 
                   <div className="p-7 sm:p-10 md:p-14">
@@ -195,6 +219,7 @@ export default function CareerQuiz({
                   className="grid min-h-[34rem] md:grid-cols-[1.05fr_.95fr]"
                 >
                   <div className="p-7 sm:p-10 md:p-14">
+                    <QuizStageRail steps={steps} currentStage={2} />
                     <div className="grid size-16 place-items-center rounded-2xl bg-lhu-blue text-white">
                       {winnerResult ? <DynamicIcon name={winnerResult.IconName} size={31} /> : <Monitor size={31} aria-hidden="true" />}
                     </div>

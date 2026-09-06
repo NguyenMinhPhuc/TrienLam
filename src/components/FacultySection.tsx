@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowUpRight, Code2, UsersRound } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import CmsImage from './CmsImage';
 
 interface FacultySectionProps {
@@ -31,8 +31,9 @@ export default function FacultySection({
   mediaCaption,
   mediaLocation,
 }: FacultySectionProps) {
+  const reduceMotion = useReducedMotion();
   return (
-    <section id="faculty" className="section-pad relative overflow-hidden bg-background">
+    <section id="faculty" className="public-content section-pad relative overflow-hidden bg-background">
       <div className="site-shell">
         <motion.h2
           initial={{ opacity: 0, y: 34 }}
@@ -60,29 +61,29 @@ export default function FacultySection({
               className="group mt-9 inline-flex items-center gap-3 font-semibold text-foreground underline decoration-lhu-orange/60 underline-offset-8"
             >
               {ctaLabel}
-              <span className="grid size-9 place-items-center rounded-full bg-lhu-orange text-white transition-transform group-hover:rotate-45">
+              <span className="grid size-9 place-items-center rounded-full bg-lhu-orange text-[#07111d] dark:text-white transition-transform group-hover:rotate-45">
                 <ArrowUpRight size={17} aria-hidden="true" />
               </span>
             </a>
 
             <div className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-card-border bg-card-border">
               <div className="bg-card-bg p-5">
-                <Code2 className="text-lhu-blue" size={24} aria-hidden="true" />
+                <Code2 className="text-public-blue" size={24} aria-hidden="true" />
                 <p className="mt-7 text-sm font-semibold leading-6 text-foreground">{featureOne}</p>
               </div>
               <div className="bg-card-bg p-5">
-                <UsersRound className="text-lhu-orange" size={24} aria-hidden="true" />
+                <UsersRound className="text-public-orange" size={24} aria-hidden="true" />
                 <p className="mt-7 text-sm font-semibold leading-6 text-foreground">{featureTwo}</p>
               </div>
             </div>
           </motion.div>
 
           <motion.div
-            initial={{ clipPath: 'inset(0 100% 0 0)', opacity: 0.6 }}
+            initial={reduceMotion ? false : { clipPath: 'inset(0 100% 0 0)', opacity: 0.6 }}
             whileInView={{ clipPath: 'inset(0 0% 0 0)', opacity: 1 }}
             viewport={{ once: true, margin: '-80px' }}
             transition={{ duration: 0.9, delay: 0.05, ease }}
-            className="relative min-h-[23rem] overflow-hidden rounded-2xl bg-[#0a1724] sm:min-h-[31rem] lg:col-span-7"
+            className="relative min-h-[23rem] overflow-hidden rounded-2xl bg-public-media dark:bg-[#0a1724] sm:min-h-[31rem] lg:col-span-7"
           >
             <CmsImage
               src={image || '/uploads/Faculty.jpg'}

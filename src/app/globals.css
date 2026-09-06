@@ -2,6 +2,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Public content only: these roles never recolor the Hero or admin controls. */
+@theme inline {
+  --color-public-blue: var(--public-blue);
+  --color-public-orange: var(--public-orange);
+  --color-public-control: var(--public-control);
+  --color-public-media: var(--public-media);
+}
+
 @theme {
   --color-lhu-blue: #2385c1;
   --color-lhu-orange: #f37021;
@@ -39,6 +47,49 @@
   --surface-1: #091725;
   --surface-2: #102335;
   color-scheme: dark;
+}
+
+.public-content {
+  --public-blue: #17638f;
+  --public-orange: #aa430d;
+  --public-control: #718698;
+  --public-media: #e1ebf1;
+  --public-shadow: 0 18px 46px -24px rgba(8, 31, 50, 0.16);
+  --public-signal-blue: rgba(23, 99, 143, 0.65);
+  --public-signal-orange: rgba(170, 67, 13, 0.6);
+  --public-signal-ring: rgba(8, 19, 31, 0.25);
+}
+
+.dark .public-content {
+  --public-blue: #2385c1;
+  --public-orange: #f37021;
+  --public-control: var(--card-border);
+  --public-media: #050b12;
+  --public-signal-blue: rgba(102, 185, 232, 0.48);
+  --public-signal-orange: rgba(243, 112, 33, 0.35);
+  --public-signal-ring: rgba(255, 255, 255, 0.16);
+}
+
+/* Light-only overrides for shared editorial helpers. Keep dark values intact. */
+:root:not(.dark) .public-content .section-copy-on-dark,
+:root:not(.dark) .public-content .footer-link {
+  color: var(--muted);
+}
+
+:root:not(.dark) .public-content .footer-link:hover {
+  color: var(--public-blue);
+}
+
+:root:not(.dark) .public-content .gradient-text {
+  color: var(--public-orange);
+}
+
+:root:not(.dark) .public-content :focus-visible {
+  outline-color: var(--public-blue);
+}
+
+:root:not(.dark) .public-content .footer-signal {
+  background-image: radial-gradient(circle, rgba(23, 99, 143, 0.4) 1px, transparent 1.5px);
 }
 
 * {

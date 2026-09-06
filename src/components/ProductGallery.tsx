@@ -42,7 +42,7 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
   const remaining = filteredProducts.slice(3);
 
   return (
-    <div>
+    <div className="public-content">
       <div aria-label="Lọc sản phẩm theo lĩnh vực" className="mb-12 flex gap-2 overflow-x-auto pb-3 md:flex-wrap">
         {categories.map((category) => {
           const active = activeTab === category.id;
@@ -52,7 +52,7 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
               key={category.id}
               onClick={() => setActiveTab(category.id)}
               aria-pressed={active}
-              className={`relative flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? 'text-[#07111d]' : 'border border-white/12 text-[#b7c8d5] hover:border-lhu-blue/70 hover:text-white'}`}
+              className={`relative flex min-h-11 shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${active ? 'text-[#07111d]' : 'border border-public-control dark:border-white/12 text-muted dark:text-[#b7c8d5] hover:border-public-blue dark:hover:border-lhu-blue/70 hover:text-foreground dark:hover:text-white'}`}
             >
               {active && <motion.span layoutId="active-product-filter" className="absolute inset-0 rounded-full bg-[#a9d6ef]" transition={{ type: 'spring', bounce: 0.16, duration: 0.5 }} />}
               <category.icon className="relative z-10" size={16} aria-hidden="true" />
@@ -78,8 +78,8 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
               </div>
 
               {remaining.length > 0 && (
-                <div className="mt-8 border-t border-white/10 pt-16">
-                  <h3 className="font-display mb-9 text-2xl font-bold tracking-[-0.012em] text-white">Khám phá thêm dự án</h3>
+                <div className="mt-8 border-t border-card-border dark:border-white/10 pt-16">
+                  <h3 className="font-display mb-9 text-2xl font-bold tracking-[-0.012em] text-foreground dark:text-white">Khám phá thêm dự án</h3>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {remaining.map((product) => <ProductCard key={product.Id} product={product} />)}
                   </div>
@@ -87,10 +87,10 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
               )}
             </>
           ) : (
-            <div className="rounded-2xl border border-dashed border-white/16 bg-white/4 px-6 py-20 text-center">
-              <Cpu className="mx-auto text-lhu-blue" size={36} aria-hidden="true" />
-              <p className="font-display mt-6 text-2xl font-semibold text-white">Danh mục này đang được cập nhật.</p>
-              <p className="mt-3 text-sm text-[#9eb1c1]">Hãy thử một lĩnh vực khác hoặc quay lại sau.</p>
+            <div className="rounded-2xl border border-dashed border-card-border dark:border-white/16 bg-card-bg dark:bg-white/4 px-6 py-20 text-center">
+              <Cpu className="mx-auto text-public-blue" size={36} aria-hidden="true" />
+              <p className="font-display mt-6 text-2xl font-semibold text-foreground dark:text-white">Danh mục này đang được cập nhật.</p>
+              <p className="mt-3 text-sm text-muted dark:text-[#9eb1c1]">Hãy thử một lĩnh vực khác hoặc quay lại sau.</p>
             </div>
           )}
         </motion.div>

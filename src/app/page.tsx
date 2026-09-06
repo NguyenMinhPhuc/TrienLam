@@ -154,10 +154,10 @@ export default async function Home() {
       />
 
       {!hasDynamicProductSection && (
-        <section id="products" className="section-pad scroll-mt-24 relative overflow-hidden bg-[#091725] text-white">
+        <section id="products" className="public-content section-pad scroll-mt-24 relative overflow-hidden bg-[var(--surface-2)] text-foreground dark:bg-[#091725] dark:text-white">
           <div className="site-shell">
             <div className="mb-14 grid gap-6 md:grid-cols-[1fr_.75fr] md:items-end">
-              <h2 className="section-title text-white">
+              <h2 className="section-title text-foreground dark:text-white">
                 {contentValue(content, 'products_title')}
               </h2>
               <p className="section-copy-on-dark md:justify-self-end">

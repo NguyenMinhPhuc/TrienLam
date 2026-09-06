@@ -88,18 +88,18 @@ export default function CareerQuiz({
   const recommendedProduct = products.find((product) => matchingPaths.includes(product.CareerPath));
 
   return (
-    <section id="quiz" className="section-pad scroll-mt-24 relative overflow-hidden bg-background">
+    <section id="quiz" className="public-content section-pad scroll-mt-24 relative overflow-hidden bg-background">
       <div className="site-shell relative z-10">
         <div className="mb-12 grid gap-6 md:grid-cols-[1fr_.7fr] md:items-end">
           <h2 className="section-title">{title}</h2>
           <p className="section-copy md:justify-self-end">{description}</p>
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[0_28px_90px_-58px_rgba(0,0,0,.85)]">
+        <div className="overflow-hidden rounded-2xl border border-card-border bg-card-bg shadow-[var(--public-shadow)] dark:shadow-[0_28px_90px_-58px_rgba(0,0,0,.85)]">
           {questions.length === 0 ? (
             <div role="status" className="grid min-h-[28rem] place-items-center p-8 text-center">
               <div>
-                <AlertCircle className="mx-auto text-lhu-orange" size={34} aria-hidden="true" />
+                <AlertCircle className="mx-auto text-public-orange" size={34} aria-hidden="true" />
                 <h3 className="font-display mt-6 text-3xl font-bold text-foreground">Trắc nghiệm đang được cập nhật</h3>
                 <p className="mx-auto mt-4 max-w-xl leading-7 text-muted">{quizData.error || 'Nội dung câu hỏi chưa sẵn sàng. Vui lòng quay lại sau.'}</p>
               </div>
@@ -131,7 +131,7 @@ export default function CareerQuiz({
                       ['03', steps[2]],
                     ].map(([number, label]) => (
                       <div key={number} className="flex items-center gap-5 border-b border-card-border py-6 last:border-b-0">
-                        <span className="font-display text-3xl font-extrabold text-lhu-blue">{number}</span>
+                        <span className="font-display text-3xl font-extrabold text-public-blue">{number}</span>
                         <span className="font-semibold text-foreground">{label}</span>
                       </div>
                     ))}
@@ -169,16 +169,16 @@ export default function CareerQuiz({
                           type="button"
                           key={option.Id}
                           onClick={() => handleAnswer(option.ResultType)}
-                          className="group flex min-h-16 w-full items-center gap-4 rounded-xl border border-card-border bg-background px-5 py-4 text-left font-medium text-foreground transition hover:border-lhu-blue/60 hover:bg-lhu-blue/8"
+                          className="group flex min-h-16 w-full items-center gap-4 rounded-xl border border-public-control bg-background px-5 py-4 text-left font-medium text-foreground transition hover:border-public-blue dark:hover:border-lhu-blue/60 hover:bg-lhu-blue/8"
                         >
-                          <span className="grid size-7 shrink-0 place-items-center rounded-full border border-card-border text-transparent transition group-hover:border-lhu-blue group-hover:text-lhu-blue"><Check size={15} aria-hidden="true" /></span>
+                          <span className="grid size-7 shrink-0 place-items-center rounded-full border border-public-control text-transparent transition group-hover:border-public-blue group-hover:text-public-blue group-focus-visible:border-public-blue group-focus-visible:text-public-blue"><Check size={15} aria-hidden="true" /></span>
                           <span className="flex-1">{option.OptionText}</span>
-                          <ArrowRight className="text-muted transition-transform group-hover:translate-x-1 group-hover:text-lhu-orange" size={18} aria-hidden="true" />
+                          <ArrowRight className="text-muted transition-transform group-hover:translate-x-1 group-hover:text-public-orange" size={18} aria-hidden="true" />
                         </button>
                       )) : (
                         <div role="alert" className="rounded-xl border border-lhu-orange/30 bg-lhu-orange/8 p-6">
                           <p className="font-semibold text-foreground">Câu hỏi này chưa có phương án trả lời.</p>
-                          <button type="button" onClick={resetQuiz} className="mt-4 font-semibold text-lhu-orange underline underline-offset-4">Quay lại màn hình bắt đầu</button>
+                          <button type="button" onClick={resetQuiz} className="mt-4 font-semibold text-public-orange underline underline-offset-4">Quay lại màn hình bắt đầu</button>
                         </div>
                       )}
                     </div>
@@ -200,7 +200,7 @@ export default function CareerQuiz({
                     </div>
                     <p className="mt-8 text-sm font-semibold text-muted">Lĩnh vực phù hợp với bạn</p>
                     <h3 className="font-display mt-3 text-[clamp(2rem,4vw,3.35rem)] font-bold leading-[1.18] tracking-[-0.01em] text-foreground">{winnerResult?.Title || winner || 'Kết quả đang cập nhật'}</h3>
-                    {industryWinner && <p className="mt-5 font-semibold text-lhu-blue">Ngành gợi ý: {industry?.Title || industryWinner}</p>}
+                    {industryWinner && <p className="mt-5 font-semibold text-public-blue">Ngành gợi ý: {industry?.Title || industryWinner}</p>}
                     <p className="mt-7 max-w-xl leading-8 text-muted">{winnerResult?.Description || 'Nội dung kết quả đang được cập nhật.'}</p>
                     <button type="button" onClick={resetQuiz} className="mt-10 inline-flex items-center gap-2 font-semibold text-foreground underline decoration-card-border underline-offset-8 hover:decoration-lhu-orange">
                       <RotateCcw size={17} aria-hidden="true" /> Làm lại trắc nghiệm
@@ -210,13 +210,13 @@ export default function CareerQuiz({
                   <div className="blueprint-surface flex items-center border-t border-card-border p-7 md:border-l md:border-t-0 md:p-10">
                     {recommendedProduct ? (
                       <div className="w-full overflow-hidden rounded-2xl border border-card-border bg-card-bg">
-                        <div className="relative aspect-[16/10] bg-[#050b12]">
+                        <div className="relative aspect-[16/10] bg-public-media">
                           <CmsImage src={recommendedProduct.ImageUrl} alt={`Ảnh dự án ${recommendedProduct.Name}`} sizes="(min-width: 768px) 40vw, 100vw" className="object-contain p-4" />
                         </div>
                         <div className="p-6">
-                          <p className="text-xs font-bold uppercase tracking-[0.12em] text-lhu-blue">Dự án nên khám phá</p>
+                          <p className="text-xs font-bold uppercase tracking-[0.12em] text-public-blue">Dự án nên khám phá</p>
                           <h4 className="font-display mt-3 text-2xl font-bold text-foreground">{recommendedProduct.Name}</h4>
-                          {recommendedProduct.AppUrl && <a href={recommendedProduct.AppUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 font-semibold text-lhu-orange">Trải nghiệm ngay <ArrowRight size={17} aria-hidden="true" /></a>}
+                          {recommendedProduct.AppUrl && <a href={recommendedProduct.AppUrl} target="_blank" rel="noreferrer" className="mt-6 inline-flex items-center gap-2 font-semibold text-public-orange">Trải nghiệm ngay <ArrowRight size={17} aria-hidden="true" /></a>}
                         </div>
                       </div>
                     ) : (

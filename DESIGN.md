@@ -182,7 +182,19 @@ Borders are one-pixel translucent hairlines: dark surfaces use cool white at rou
 
 **The Signal and Action Rule.** Blue explains where the user is; orange tells the user what to do next. Do not give both accents equal visual weight inside one component.
 
-**The Dark Anchor Rule.** Major narrative anchors stay on Blueprint Navy, Navy Surface, or Deep Ink so media, metrics, and orange actions retain contrast and authority.
+**The Dark Anchor Rule.** In Dark mode, major narrative anchors stay on Blueprint Navy, Navy Surface, or Deep Ink so media, metrics, and orange actions retain contrast and authority. The Hero retains its existing treatment in both modes; content below it follows the selected theme.
+
+### Light content mode
+
+The public sections below the Hero, shared academic content, the academic closing CTA, and product dialogs use a complete light palette. Scope these roles with `.public-content`, including the portalled dialog, rather than changing brand primitives, the Hero, navigation, or admin styles. Dark-mode component values remain the baseline described below.
+
+- Use Blueprint Paper for the page, white for cards and contact, `#f7fbfd` for quiet reading sections, and `#e1ebf1` for gallery/media wells and the footer.
+- Use Body Ink and Muted Slate for text. Public blue `#17638f` and public orange `#aa430d` support readable small labels and icons on light surfaces; keep the original bright orange primary button and legacy logo colors.
+- Use `#718698` for input and choice boundaries, public blue for keyboard focus, and restrained blue-gray shadows for elevated cards. Contact feedback uses `#b13c26` for errors and `#1d7048` for success, with text/icon cues.
+- Preserve typography, spacing, mission justification, CMS content, image colors, filtering, quiz state and contact submission behavior. Dark overlays are localized to photo captions and dialog backdrops, not whole light sections. Third-party embeds control their own internal theme.
+- Preserve the section-specific motions. Counters and the faculty image wipe respect reduced-motion preferences alongside the existing MotionConfig and CSS fallbacks.
+
+Run `node scripts/check-public-theme.mjs` for palette, generated utility and scope checks. These are static checks; desktop/mobile screenshots and interaction testing require a connected browser.
 
 ## Typography
 

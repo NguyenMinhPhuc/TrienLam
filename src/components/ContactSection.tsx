@@ -12,7 +12,7 @@ interface ContactSectionProps {
   email?: string;
 }
 
-const fieldClass = 'w-full border-0 border-b border-white/16 bg-transparent px-0 py-4 text-base text-white outline-none placeholder:text-[#6f8597] focus:border-lhu-blue focus:ring-0';
+const fieldClass = 'w-full border-0 border-b border-public-control dark:border-white/16 bg-transparent px-0 py-4 text-base text-foreground dark:text-white placeholder:text-muted dark:placeholder:text-[#6f8597] focus:border-public-blue focus:ring-0';
 
 export default function ContactSection({ title, description, address, phone, email }: ContactSectionProps) {
   const [formData, setFormData] = useState({ fullName: '', email: '', phone: '', message: '' });
@@ -59,7 +59,7 @@ export default function ContactSection({ title, description, address, phone, ema
   ];
 
   return (
-    <section id="contact" className="section-pad relative overflow-hidden bg-[#07111d] text-white">
+    <section id="contact" className="public-content section-pad relative overflow-hidden bg-card-bg dark:bg-[#07111d] text-foreground dark:text-white">
       <div className="site-shell relative z-10">
         <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-24">
           <motion.div
@@ -68,45 +68,45 @@ export default function ContactSection({ title, description, address, phone, ema
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
           >
-            <h2 className="section-title text-white">{title}</h2>
-            <p className="prose-copy mt-7 max-w-xl text-base leading-8 text-[#a8bac8]">{description}</p>
+            <h2 className="section-title text-foreground dark:text-white">{title}</h2>
+            <p className="prose-copy mt-7 max-w-xl text-base leading-8 text-muted dark:text-[#a8bac8]">{description}</p>
 
-            <div className="mt-12 divide-y divide-white/10 border-y border-white/10">
+            <div className="mt-12 divide-y divide-card-border dark:divide-white/10 border-y border-card-border dark:border-white/10">
               {contactItems.map((item) => (
                 <div key={item.label} className="grid grid-cols-[2.5rem_1fr] gap-4 py-6">
-                  <item.icon className="mt-1 text-lhu-orange" size={21} aria-hidden="true" />
+                  <item.icon className="mt-1 text-public-orange" size={21} aria-hidden="true" />
                   <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#7e95a7]">{item.label}</p>
-                    <p className="mt-2 break-words font-medium text-[#e4edf3]">{item.value}</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted dark:text-[#7e95a7]">{item.label}</p>
+                    <p className="mt-2 break-words font-medium text-foreground dark:text-[#e4edf3]">{item.value}</p>
                   </div>
                 </div>
               ))}
             </div>
           </motion.div>
 
-          <form onSubmit={handleSubmit} className="border-t border-white/12 pt-8" aria-label="Gửi thông tin liên hệ">
+          <form onSubmit={handleSubmit} className="border-t border-card-border dark:border-white/12 pt-8" aria-label="Gửi thông tin liên hệ">
             <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
               <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.05 }}>
-                <label htmlFor="contact-full-name" className="text-xs font-bold uppercase tracking-[0.12em] text-[#91a6b7]">Họ và tên</label>
+                <label htmlFor="contact-full-name" className="text-xs font-bold uppercase tracking-[0.12em] text-muted dark:text-[#91a6b7]">Họ và tên</label>
                 <input id="contact-full-name" name="fullName" type="text" autoComplete="name" required value={formData.fullName} onChange={(event) => setFormData({ ...formData, fullName: event.target.value })} className={fieldClass} placeholder="Nguyễn Văn A" />
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
-                <label htmlFor="contact-email" className="text-xs font-bold uppercase tracking-[0.12em] text-[#91a6b7]">Email liên hệ</label>
+                <label htmlFor="contact-email" className="text-xs font-bold uppercase tracking-[0.12em] text-muted dark:text-[#91a6b7]">Email liên hệ</label>
                 <input id="contact-email" name="email" type="email" autoComplete="email" required value={formData.email} onChange={(event) => setFormData({ ...formData, email: event.target.value })} className={fieldClass} placeholder="example@gmail.com" />
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 }} className="sm:col-span-2">
-                <label htmlFor="contact-phone" className="text-xs font-bold uppercase tracking-[0.12em] text-[#91a6b7]">Số điện thoại</label>
+                <label htmlFor="contact-phone" className="text-xs font-bold uppercase tracking-[0.12em] text-muted dark:text-[#91a6b7]">Số điện thoại</label>
                 <input id="contact-phone" name="phone" type="tel" autoComplete="tel" value={formData.phone} onChange={(event) => setFormData({ ...formData, phone: event.target.value })} className={fieldClass} placeholder="09xx xxx xxx" />
               </motion.div>
               <motion.div initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="sm:col-span-2">
-                <label htmlFor="contact-message" className="text-xs font-bold uppercase tracking-[0.12em] text-[#91a6b7]">Bạn quan tâm điều gì?</label>
+                <label htmlFor="contact-message" className="text-xs font-bold uppercase tracking-[0.12em] text-muted dark:text-[#91a6b7]">Bạn quan tâm điều gì?</label>
                 <textarea id="contact-message" name="message" rows={4} required value={formData.message} onChange={(event) => setFormData({ ...formData, message: event.target.value })} className={`${fieldClass} resize-y`} placeholder="Hãy để lại lời nhắn cho chúng tôi..." />
               </motion.div>
             </div>
 
             <div className="mt-8 min-h-7" aria-live="polite">
-              {error && <p role="alert" className="text-sm font-semibold text-[#ff9b80]">{error} Vui lòng kiểm tra thông tin và thử lại.</p>}
-              {isSent && <p role="status" className="flex items-center gap-2 text-sm font-semibold text-[#83d8ac]"><CheckCircle2 size={18} aria-hidden="true" /> Tin nhắn đã được gửi thành công.</p>}
+              {error && <p role="alert" className="text-sm font-semibold text-[#b13c26] dark:text-[#ff9b80]">{error} Vui lòng kiểm tra thông tin và thử lại.</p>}
+              {isSent && <p role="status" className="flex items-center gap-2 text-sm font-semibold text-[#1d7048] dark:text-[#83d8ac]"><CheckCircle2 size={18} aria-hidden="true" /> Tin nhắn đã được gửi thành công.</p>}
             </div>
 
             <button type="submit" disabled={isSending || isSent} className="button-primary mt-5 w-full disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto sm:min-w-56">

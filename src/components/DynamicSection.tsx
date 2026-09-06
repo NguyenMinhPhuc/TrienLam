@@ -43,7 +43,7 @@ function ItemMedia({ item, light = false }: { item: ContentItem; light?: boolean
   return (
     <div className="mt-6">
       {item.image && (
-        <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl bg-[#050b12]">
+        <div className="relative mb-5 aspect-[16/9] overflow-hidden rounded-xl bg-public-media">
           <CmsImage
             src={item.image}
             alt={item.imageAlt || item.title || 'Ảnh minh họa nội dung'}
@@ -57,7 +57,7 @@ function ItemMedia({ item, light = false }: { item: ContentItem; light?: boolean
           href={item.linkUrl}
           target={isExternal ? '_blank' : undefined}
           rel={isExternal ? 'noreferrer' : undefined}
-          className={`inline-flex items-center gap-2 text-sm font-semibold underline decoration-lhu-orange/60 underline-offset-4 ${light ? 'text-white' : 'text-foreground'}`}
+          className={`inline-flex items-center gap-2 text-sm font-semibold underline decoration-lhu-orange/60 underline-offset-4 ${light ? 'text-foreground dark:text-white' : 'text-foreground'}`}
         >
           {item.linkLabel || 'Tìm hiểu thêm'}
           <ArrowUpRight size={16} aria-hidden="true" />
@@ -75,7 +75,7 @@ function SectionIntro({ title, subtitle, light = false }: { title: string; subti
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.62, ease }}
-        className={`section-title ${light ? 'text-white' : 'text-foreground'}`}
+        className={`section-title ${light ? 'text-foreground dark:text-white' : 'text-foreground'}`}
         dangerouslySetInnerHTML={{ __html: title }}
       />
       {subtitle && (
@@ -119,7 +119,7 @@ export default function DynamicSection({
 
   if (layoutType === 'product-showcase') {
     return (
-      <section id={anchorId} className="section-pad scroll-mt-24 overflow-hidden bg-[#091725] text-white">
+      <section id={anchorId} className="public-content section-pad scroll-mt-24 overflow-hidden bg-[var(--surface-2)] dark:bg-[#091725] text-foreground dark:text-white">
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} light />
           <ProductGallery products={products} />
@@ -130,7 +130,7 @@ export default function DynamicSection({
 
   if (layoutType === 'timeline') {
     return (
-      <section id={anchorId} className={`section-pad scroll-mt-24 relative overflow-hidden ${sectionSurface}`}>
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 relative overflow-hidden ${sectionSurface}`}>
         <div className="site-shell relative z-10">
           <SectionIntro title={title} subtitle={subtitle} />
           <div className="relative mx-auto max-w-5xl">
@@ -158,7 +158,7 @@ export default function DynamicSection({
                     <span className="size-2 rounded-full bg-lhu-orange" />
                   </span>
                   <div className={`${index % 2 === 0 ? 'md:pr-14' : 'md:pl-14'} py-5`}>
-                    <DynamicIcon name={item.icon} size={25} className="text-lhu-blue" />
+                    <DynamicIcon name={item.icon} size={25} className="text-public-blue" />
                     <h3 className="font-display mt-5 text-2xl font-bold tracking-[-0.012em] text-foreground">{item.title}</h3>
                     <p className="prose-copy mt-4 text-sm leading-7 text-muted sm:text-base">{item.body}</p>
                     <ItemMedia item={item} />
@@ -175,17 +175,17 @@ export default function DynamicSection({
   if (layoutType === 'script-embed') {
     const scriptData = items[0];
     return (
-      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} />
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-card-border bg-[#050b12] p-2 shadow-[0_24px_70px_-40px_rgba(0,0,0,.9)]">
-            <div className="flex items-center gap-2 border-b border-white/9 px-4 py-3" aria-hidden="true">
+          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-card-border bg-public-media p-2 shadow-[var(--public-shadow)] dark:shadow-[0_24px_70px_-40px_rgba(0,0,0,.9)]">
+            <div className="flex items-center gap-2 border-b border-card-border dark:border-white/9 px-4 py-3" aria-hidden="true">
               <span className="size-2.5 rounded-full bg-lhu-orange" />
               <span className="size-2.5 rounded-full bg-lhu-blue" />
-              <span className="size-2.5 rounded-full bg-white/20" />
+              <span className="size-2.5 rounded-full bg-public-control dark:bg-white/20" />
             </div>
             <div id={scriptData?.containerId || 'script-container'} className="grid min-h-[34rem] w-full place-items-stretch overflow-hidden">
-              {!scriptData?.src && <p className="m-auto max-w-md px-6 text-center text-sm leading-7 text-[#8da3b5]">Chưa cấu hình Script URL. Vui lòng nhập URL trong trang quản trị để hiển thị sản phẩm nhúng.</p>}
+              {!scriptData?.src && <p className="m-auto max-w-md px-6 text-center text-sm leading-7 text-muted dark:text-[#8da3b5]">Chưa cấu hình Script URL. Vui lòng nhập URL trong trang quản trị để hiển thị sản phẩm nhúng.</p>}
             </div>
             {scriptData?.src && (
               <Script
@@ -204,7 +204,7 @@ export default function DynamicSection({
 
   if (layoutType === '1-col') {
     return (
-      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} />
           <div
@@ -225,7 +225,7 @@ export default function DynamicSection({
                     aria-expanded={isOpen}
                     onClick={() => setOpenIndex(isOpen ? -1 : index)}
                   >
-                    <DynamicIcon name={item.icon} size={23} className="shrink-0 text-lhu-blue" />
+                    <DynamicIcon name={item.icon} size={23} className="shrink-0 text-public-blue" />
                     <span className="font-display flex-1 text-lg font-bold tracking-[-0.012em] text-foreground sm:text-xl">{item.title}</span>
                     <motion.span animate={{ rotate: isOpen ? 180 : 0 }} className="grid size-9 shrink-0 place-items-center rounded-full border border-card-border">
                       <ChevronDown size={17} aria-hidden="true" />
@@ -262,7 +262,7 @@ export default function DynamicSection({
 
   if (layoutType === '2-col') {
     return (
-      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} />
           <div className="grid gap-x-14 gap-y-10 md:grid-cols-2">
@@ -276,7 +276,7 @@ export default function DynamicSection({
                 className="border-t border-card-border pt-7"
               >
                 <div className="flex items-center gap-4">
-                  <DynamicIcon name={item.icon} size={25} className="text-lhu-blue" />
+                  <DynamicIcon name={item.icon} size={25} className="text-public-blue" />
                   <h3 className="font-display text-2xl font-bold tracking-[-0.012em] text-foreground">{item.title}</h3>
                 </div>
                 <p className="prose-copy mt-6 max-w-[62ch] text-base leading-8 text-muted">{item.body}</p>
@@ -291,7 +291,7 @@ export default function DynamicSection({
 
   if (layoutType === '4-col') {
     return (
-      <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} />
           <div className="divide-y divide-card-border border-y border-card-border">
@@ -304,8 +304,8 @@ export default function DynamicSection({
                 transition={{ duration: 0.5, delay: index * 0.06, ease }}
                 className="grid gap-5 py-6 sm:grid-cols-[3rem_1fr] md:grid-cols-[3rem_3rem_.8fr_1.2fr] md:items-center md:gap-7 md:py-8"
               >
-                <span className="font-display text-sm font-bold tabular-nums text-lhu-orange">{String(index + 1).padStart(2, '0')}</span>
-                <DynamicIcon name={item.icon} size={24} className="hidden text-lhu-blue sm:block" />
+                <span className="font-display text-sm font-bold tabular-nums text-public-orange">{String(index + 1).padStart(2, '0')}</span>
+                <DynamicIcon name={item.icon} size={24} className="hidden text-public-blue sm:block" />
                 <h3 className="font-display text-xl font-bold tracking-[-0.012em] text-foreground sm:col-start-2 md:col-start-auto">{item.title}</h3>
                 <p className="prose-copy text-sm leading-7 text-muted sm:col-start-2 md:col-start-auto sm:text-base">{item.body}</p>
                 {(item.image || item.linkUrl) && (
@@ -322,7 +322,7 @@ export default function DynamicSection({
   }
 
   return (
-    <section id={anchorId} className={`section-pad scroll-mt-24 ${sectionSurface}`}>
+    <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
       <div className="site-shell">
         <SectionIntro title={title} subtitle={subtitle} />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -333,15 +333,15 @@ export default function DynamicSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.55, delay: index * 0.08, ease }}
-              className={`group p-7 sm:p-9 ${index === 0 ? 'rounded-2xl bg-[#091725] text-white md:col-span-2 lg:grid lg:grid-cols-[.45fr_1fr] lg:gap-12 lg:col-span-2' : 'border-t border-card-border bg-transparent'}`}
+              className={`group p-7 sm:p-9 ${index === 0 ? 'rounded-2xl bg-[var(--surface-2)] dark:bg-[#091725] text-foreground dark:text-white md:col-span-2 lg:grid lg:grid-cols-[.45fr_1fr] lg:gap-12 lg:col-span-2' : 'border-t border-card-border bg-transparent'}`}
             >
               <div className="flex items-start justify-between">
-                <DynamicIcon name={item.icon} size={28} className={`${index === 0 ? 'text-lhu-orange' : 'text-lhu-blue'} transition-transform duration-300 group-hover:-translate-y-1`} />
-                <span className={`font-display text-xs font-bold tabular-nums ${index === 0 ? 'text-[#8fa6b7]' : 'text-muted'}`}>{String(index + 1).padStart(2, '0')}</span>
+                <DynamicIcon name={item.icon} size={28} className={`${index === 0 ? 'text-public-orange' : 'text-public-blue'} transition-transform duration-300 group-hover:-translate-y-1`} />
+                <span className={`font-display text-xs font-bold tabular-nums ${index === 0 ? 'text-muted dark:text-[#8fa6b7]' : 'text-muted'}`}>{String(index + 1).padStart(2, '0')}</span>
               </div>
               <div>
-                <h3 className={`font-display mt-10 text-2xl font-bold tracking-[-0.012em] ${index === 0 ? 'text-white lg:mt-0 lg:text-3xl' : 'text-foreground'}`}>{item.title}</h3>
-                <p className={`prose-copy mt-5 text-sm leading-7 sm:text-base ${index === 0 ? 'text-[#aec0cd]' : 'text-muted'}`}>{item.body}</p>
+                <h3 className={`font-display mt-10 text-2xl font-bold tracking-[-0.012em] ${index === 0 ? 'text-foreground dark:text-white lg:mt-0 lg:text-3xl' : 'text-foreground'}`}>{item.title}</h3>
+                <p className={`prose-copy mt-5 text-sm leading-7 sm:text-base ${index === 0 ? 'text-muted dark:text-[#aec0cd]' : 'text-muted'}`}>{item.body}</p>
                 <ItemMedia item={item} light={index === 0} />
               </div>
             </motion.article>

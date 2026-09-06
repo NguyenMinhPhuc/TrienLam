@@ -61,11 +61,11 @@ export default async function AcademicPage() {
         ))
       )}
 
-      <section className="section-pad relative overflow-hidden bg-[#091725] text-white">
+      <section className="public-content section-pad relative overflow-hidden bg-[var(--surface-2)] dark:bg-[#091725] text-foreground dark:text-white">
         <div className="site-shell relative z-10 grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
           <div>
-            <h2 className="section-title max-w-[16ch] text-white">Sẵn sàng trở thành kỹ sư CNTT thế hệ mới?</h2>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-[#a9bac8]">Đăng ký xét tuyển để tìm hiểu chương trình đào tạo và môi trường học tập thực chiến tại Đại học Lạc Hồng.</p>
+            <h2 className="section-title max-w-[16ch] text-foreground dark:text-white">Sẵn sàng trở thành kỹ sư CNTT thế hệ mới?</h2>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-muted dark:text-[#a9bac8]">Đăng ký xét tuyển để tìm hiểu chương trình đào tạo và môi trường học tập thực chiến tại Đại học Lạc Hồng.</p>
           </div>
           <a href="https://tuyensinh.lhu.edu.vn" target="_blank" rel="noreferrer" className="button-primary px-8">Đăng ký xét tuyển →</a>
         </div>

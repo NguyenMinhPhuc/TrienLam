@@ -48,11 +48,11 @@ export default function SiteFooter({
   const navClass = layout === '1-col' ? 'justify-items-center sm:grid-cols-2 sm:gap-x-8' : '';
 
   return (
-    <footer className="site-footer relative overflow-hidden border-t border-white/8 bg-[#050b12] text-white">
+    <footer className="public-content site-footer relative overflow-hidden border-t border-card-border dark:border-white/8 bg-[var(--surface-2)] dark:bg-[#050b12] text-foreground dark:text-white">
       <div className="footer-signal" aria-hidden="true" />
       <div className="site-shell relative z-10 py-14 md:py-18">
         {showMap && mapEmbed && (
-          <div className="mb-12 overflow-hidden rounded-2xl border border-white/10 bg-[#09131f] p-1 [&_iframe]:min-h-80 [&_iframe]:w-full">
+          <div className="mb-12 overflow-hidden rounded-2xl border border-card-border dark:border-white/10 bg-card-bg dark:bg-[#09131f] p-1 [&_iframe]:min-h-80 [&_iframe]:w-full">
             <div dangerouslySetInnerHTML={{ __html: mapEmbed }} />
           </div>
         )}
@@ -60,9 +60,9 @@ export default function SiteFooter({
         <div className={`grid gap-10 md:gap-12 ${layoutClass}`}>
           <div className="max-w-xl">
             <BrandLogo className="text-2xl" />
-            <p className="mt-5 font-display text-lg font-semibold tracking-[-0.012em] text-white">{title}</p>
-            <p className={`mt-4 flex gap-3 text-sm leading-7 text-[#a9bacb] ${layout === '1-col' ? 'items-center justify-center' : 'items-start'}`}>
-              <MapPin className="mt-1 shrink-0 text-lhu-orange" size={18} aria-hidden="true" />
+            <p className="mt-5 font-display text-lg font-semibold tracking-[-0.012em] text-foreground dark:text-white">{title}</p>
+            <p className={`mt-4 flex gap-3 text-sm leading-7 text-muted dark:text-[#a9bacb] ${layout === '1-col' ? 'items-center justify-center' : 'items-start'}`}>
+              <MapPin className="mt-1 shrink-0 text-public-orange" size={18} aria-hidden="true" />
               <span>{address}</span>
             </p>
           </div>
@@ -76,7 +76,7 @@ export default function SiteFooter({
           </nav>
 
           <div>
-            <p className="mb-5 text-sm font-semibold text-white">{followTitle}</p>
+            <p className="mb-5 text-sm font-semibold text-foreground dark:text-white">{followTitle}</p>
             {activeSocialLinks.length > 0 ? (
               <div className={`flex flex-wrap gap-3 ${layout === '1-col' ? 'justify-center' : ''}`}>
                 {activeSocialLinks.map(([name, href]) => (
@@ -86,22 +86,22 @@ export default function SiteFooter({
                     target="_blank"
                     rel="noreferrer"
                     aria-label={name}
-                    className="grid size-11 place-items-center rounded-full border border-white/12 text-[#a9bacb] transition hover:-translate-y-1 hover:border-lhu-orange/70 hover:text-white"
+                    className="grid size-11 place-items-center rounded-full border border-card-border dark:border-white/12 text-muted dark:text-[#a9bacb] transition hover:-translate-y-1 hover:border-lhu-orange/70 hover:text-foreground dark:hover:text-white"
                   >
                     <DynamicIcon name={socialIconNames[name]} size={19} />
                   </a>
                 ))}
               </div>
             ) : (
-              <p className="text-sm leading-7 text-[#a9bacb]">{socialEmptyText}</p>
+              <p className="text-sm leading-7 text-muted dark:text-[#a9bacb]">{socialEmptyText}</p>
             )}
           </div>
         </div>
 
-        <div className="mt-12 border-t border-white/8 pt-6">
-          <div className="flex flex-col gap-3 text-xs text-[#7f93a7] sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 border-t border-card-border dark:border-white/8 pt-6">
+          <div className="flex flex-col gap-3 text-xs text-muted dark:text-[#7f93a7] sm:flex-row sm:items-center sm:justify-between">
             <p>{copy}</p>
-            <a href="#top" className="w-fit font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-lhu-orange">
+            <a href="#top" className="w-fit font-semibold text-foreground dark:text-white underline decoration-public-control dark:decoration-white/30 underline-offset-4 hover:decoration-lhu-orange">
               {backToTopLabel}
             </a>
           </div>

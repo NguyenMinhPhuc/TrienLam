@@ -88,30 +88,35 @@ export default function Hero({
             initial={{ opacity: 0, x: 26 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.35, ease }}
-            className="hidden lg:block"
+            className="hidden px-6 lg:block"
           >
-            <div className="relative ml-auto aspect-square w-full max-w-[21rem]">
-              <div className="hero-radar absolute inset-0 rounded-full border border-white/14" />
-              <div className="absolute inset-[13%] rounded-full border border-dashed border-lhu-blue/45" />
-              <div className="absolute inset-[28%] grid place-items-center rounded-full bg-[#0a1724]/82 shadow-[0_24px_70px_-26px_rgba(0,0,0,.9)] backdrop-blur-md">
+            <div className="hero-orbit relative ml-auto aspect-square w-full max-w-[21rem]">
+              <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+                <div className="hero-orbit-halo" />
+                <div className="hero-orbit-ring hero-orbit-ring-outer" />
+                <div className="hero-orbit-ring hero-orbit-ring-inner" />
+              </div>
+              <div className="hero-orbit-core absolute inset-[28%] grid place-items-center rounded-full bg-[#0a1724]/82 shadow-[0_24px_70px_-26px_rgba(0,0,0,.9)] backdrop-blur-md">
                 <div className="text-center">
                   <span className="font-display text-4xl font-extrabold tracking-[-0.04em] text-lhu-orange">LHU</span>
                   <span className="mt-1 block text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#b9c9d6]">Tech Hub</span>
                 </div>
               </div>
-              {['AI', 'SOFTWARE', 'NETWORK', 'IoT'].map((label, index) => (
-                <span
-                  key={label}
-                  className={`absolute rounded-full border border-white/12 bg-[#08131f]/88 px-3 py-1.5 text-[0.65rem] font-bold tracking-[0.14em] text-[#d7e2ea] backdrop-blur-md ${[
-                    'left-[2%] top-[24%]',
-                    'right-[-4%] top-[18%]',
-                    'bottom-[18%] left-[4%]',
-                    'bottom-[10%] right-[11%]',
-                  ][index]}`}
-                >
-                  {label}
-                </span>
-              ))}
+              <div className="hero-orbit-topics absolute inset-[4%]">
+                {['AI', 'SOFTWARE', 'NETWORK', 'IoT'].map((label, index) => (
+                  <span
+                    key={label}
+                    className={`hero-orbit-label absolute whitespace-nowrap rounded-full border border-lhu-blue/30 bg-[#08131f]/95 px-3 py-1.5 text-[0.65rem] font-bold tracking-[0.14em] text-[#d7e2ea] ${[
+                      'left-[6.7%] top-[25%]',
+                      'left-[85.35%] top-[14.65%]',
+                      'left-[14.65%] top-[85.35%]',
+                      'left-[85.35%] top-[85.35%]',
+                    ][index]}`}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
             </div>
           </motion.div>
         </div>

@@ -24,7 +24,7 @@ export const dynamic = 'force-dynamic';
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const result = await query('SELECT * FROM Products ORDER BY Year DESC, Id DESC');
+    const result = await query('SELECT * FROM Products WHERE IsVisible = 1 ORDER BY Year DESC, Id DESC');
     return result.recordset;
   } catch (err) {
     console.error('Failed to fetch products:', err);

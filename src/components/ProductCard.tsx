@@ -16,6 +16,7 @@ export interface Product {
   CareerPath: string;
   Year: number;
   Author?: string;
+  IsVisible?: boolean;
 }
 
 interface ProductCardProps {

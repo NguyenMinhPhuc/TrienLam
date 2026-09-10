@@ -179,14 +179,16 @@ export default function DynamicSection({
       <section id={anchorId} className={`public-content section-pad scroll-mt-24 ${sectionSurface}`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} />
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-card-border bg-public-media p-2 shadow-[var(--public-shadow)] dark:shadow-[0_24px_70px_-40px_rgba(0,0,0,.9)]">
-            <div className="flex items-center gap-2 border-b border-card-border dark:border-white/9 px-4 py-3" aria-hidden="true">
+          <div className="mx-auto max-w-6xl overflow-hidden rounded-3xl border border-card-border bg-public-media p-2 shadow-[var(--public-shadow)] dark:shadow-[0_24px_70px_-40px_rgba(0,0,0,.9)]">
+            <div className="flex items-center gap-2 px-4 py-3" aria-hidden="true">
               <span className="size-2.5 rounded-full bg-lhu-orange" />
               <span className="size-2.5 rounded-full bg-lhu-blue" />
               <span className="size-2.5 rounded-full bg-public-control dark:bg-white/20" />
             </div>
-            <div id={scriptData?.containerId || 'script-container'} className="grid min-h-[34rem] w-full place-items-stretch overflow-hidden">
-              {!scriptData?.src && <p className="m-auto max-w-md px-6 text-center text-sm leading-7 text-muted dark:text-[#8da3b5]">Chưa cấu hình Script URL. Vui lòng nhập URL trong trang quản trị để hiển thị sản phẩm nhúng.</p>}
+            <div className="isolate overflow-hidden rounded-2xl">
+              <div id={scriptData?.containerId || 'script-container'} className="grid min-h-[34rem] w-full place-items-stretch overflow-hidden">
+                {!scriptData?.src && <p className="m-auto max-w-md px-6 text-center text-sm leading-7 text-muted dark:text-[#8da3b5]">Chưa cấu hình Script URL. Vui lòng nhập URL trong trang quản trị để hiển thị sản phẩm nhúng.</p>}
+              </div>
             </div>
             {scriptData?.src && (
               <Script

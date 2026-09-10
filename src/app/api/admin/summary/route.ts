@@ -4,7 +4,7 @@ import { query } from '@/lib/db';
 export async function GET() {
   try {
     const [products, sections, stats] = await Promise.all([
-      query('SELECT COUNT(*) as count FROM Products'),
+      query('SELECT COUNT(*) as count FROM Products WHERE IsVisible = 1'),
       query('SELECT COUNT(*) as count FROM CustomSections'),
       query('SELECT COUNT(*) as count FROM Stats'),
     ]);

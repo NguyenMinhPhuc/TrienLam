@@ -6,8 +6,10 @@ import {
   Edit2, 
   Trash2, 
   Search, 
-  X, 
-  Upload
+  X,
+  Upload,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { Product } from '@/components/ProductCard';
 import CmsImage from '@/components/CmsImage';
@@ -19,6 +21,7 @@ export default function ProductsManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [updatingVisibilityId, setUpdatingVisibilityId] = useState<number | null>(null);
 
   // Form State
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -29,7 +32,8 @@ export default function ProductsManager() {
     TechTags: '',
     CareerPath: 'AI',
     Year: new Date().getFullYear(),
-    Author: ''
+    Author: '',
+    IsVisible: true,
   });
 
   const fetchProducts = async () => {
@@ -56,6 +60,28 @@ export default function ProductsManager() {
     if (!confirm('Bạn có chắc chắn muốn xóa dự án này?')) return;
     const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchProducts();
+  };
+
+  const toggleVisibility = async (product: Product) => {
+    const isVisible = product.IsVisible !== false;
+    setUpdatingVisibilityId(product.Id);
+
+    try {
+      const res = await fetch('/api/admin/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Id: product.Id, IsVisible: !isVisible }),
+      });
+
+      if (!res.ok) throw new Error('Visibility update failed');
+      setProducts((current) => current.map((item) => (
+        item.Id === product.Id ? { ...item, IsVisible: !isVisible } : item
+      )));
+    } catch {
+      alert('Không thể cập nhật trạng thái dự án. Vui lòng thử lại.');
+    } finally {
+      setUpdatingVisibilityId(null);
+    }
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -113,7 +139,8 @@ export default function ProductsManager() {
         TechTags: '',
         CareerPath: 'AI',
         Year: new Date().getFullYear(),
-        Author: ''
+        Author: '',
+        IsVisible: true,
       });
       fetchProducts();
     }
@@ -168,7 +195,7 @@ export default function ProductsManager() {
               {loading ? (
                 <tr><td colSpan={4} className="p-20 text-center text-slate-500">Đang tải dữ liệu...</td></tr>
               ) : filteredProducts.map((p) => (
-                <tr key={p.Id} className="hover:bg-white/5 transition-colors group">
+                <tr key={p.Id} className={`hover:bg-white/5 transition-colors group ${p.IsVisible === false ? 'opacity-60' : ''}`}>
                   <td className="px-8 py-6">
                     <div className="flex items-center gap-4">
                       <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-slate-800 flex-shrink-0 border border-white/10">
@@ -188,6 +215,17 @@ export default function ProductsManager() {
                   </td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex justify-end gap-2">
+                       <button
+                         type="button"
+                         aria-label={p.IsVisible !== false ? `Ẩn dự án ${p.Name}` : `Hiển thị dự án ${p.Name}`}
+                         title={p.IsVisible !== false ? 'Ẩn khỏi website' : 'Hiển thị trên website'}
+                         aria-pressed={p.IsVisible !== false}
+                         disabled={updatingVisibilityId === p.Id}
+                         onClick={() => toggleVisibility(p)}
+                         className={`p-3 rounded-xl transition-all disabled:cursor-wait disabled:opacity-50 ${p.IsVisible !== false ? 'text-green-400 hover:bg-green-400/10 hover:text-green-300' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}
+                       >
+                         {p.IsVisible !== false ? <Eye size={18} /> : <EyeOff size={18} />}
+                       </button>
                        <button aria-label={`Sửa dự án ${p.Name}`} onClick={() => handleEdit(p)} className="p-3 hover:bg-lhu-blue/10 rounded-xl text-slate-400 hover:text-lhu-blue transition-all"><Edit2 size={18} /></button>
                        <button aria-label={`Xóa dự án ${p.Name}`} onClick={() => handleDelete(p.Id)} className="p-3 hover:bg-red-500/10 rounded-xl text-red-300 hover:text-red-400 transition-all"><Trash2 size={18} /></button>
                     </div>

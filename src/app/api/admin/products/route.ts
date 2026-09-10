@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     const { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author } = body;
 
     await execute(
-      `INSERT INTO Products (Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author) 
-       VALUES (@Name, @Description, @ImageUrl, @AppUrl, @TechTags, @CareerPath, @Year, @Author)`,
+      `INSERT INTO Products (Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author, IsVisible)
+       VALUES (@Name, @Description, @ImageUrl, @AppUrl, @TechTags, @CareerPath, @Year, @Author, 1)`,
       { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author }
     );
 
@@ -31,19 +31,55 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { Id, Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author } = body;
+    const { Id, Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author, IsVisible } = body;
+    const hasVisibility = typeof IsVisible === 'boolean';
+    const params = {
+      Id,
+      Name,
+      Description,
+      ImageUrl,
+      AppUrl,
+      TechTags,
+      CareerPath,
+      Year,
+      Author,
+      ...(hasVisibility ? { IsVisible } : {}),
+    };
 
     await execute(
       `UPDATE Products SET Name = @Name, Description = @Description, ImageUrl = @ImageUrl, 
-       AppUrl = @AppUrl, TechTags = @TechTags, CareerPath = @CareerPath, Year = @Year, Author = @Author 
+       AppUrl = @AppUrl, TechTags = @TechTags, CareerPath = @CareerPath, Year = @Year, Author = @Author,
+       ${hasVisibility ? 'IsVisible = @IsVisible' : 'IsVisible = IsVisible'}
        WHERE Id = @Id`,
-      { Id, Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author }
+      params
     );
 
     return NextResponse.json({ message: 'Product updated successfully' });
   } catch (err) {
     console.error('Update Error:', err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const id = Number(body?.Id);
+    const isVisible = body?.IsVisible;
+
+    if (!Number.isInteger(id) || typeof isVisible !== 'boolean') {
+      return NextResponse.json({ error: 'Id and IsVisible are required' }, { status: 400 });
+    }
+
+    await execute('UPDATE Products SET IsVisible = @IsVisible WHERE Id = @Id', {
+      Id: id,
+      IsVisible: isVisible,
+    });
+
+    return NextResponse.json({ message: isVisible ? 'Product shown' : 'Product hidden', IsVisible: isVisible });
+  } catch (err) {
+    console.error('Visibility update error:', err);
+    return NextResponse.json({ error: 'Visibility update failed' }, { status: 500 });
   }
 }
 

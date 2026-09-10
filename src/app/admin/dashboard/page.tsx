@@ -7,7 +7,9 @@ import {
   ArrowUpRight, 
   CheckCircle2, 
   Clock, 
-  ExternalLink 
+  ExternalLink,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -24,6 +26,7 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [updatingVisibilityId, setUpdatingVisibilityId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -41,6 +44,33 @@ export default function AdminDashboard() {
     };
     fetchStats();
   }, []);
+
+  const toggleVisibility = async (product: Product) => {
+    const isVisible = product.IsVisible !== false;
+    setUpdatingVisibilityId(product.Id);
+
+    try {
+      const res = await fetch('/api/admin/products', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ Id: product.Id, IsVisible: !isVisible }),
+      });
+
+      if (!res.ok) throw new Error('Visibility update failed');
+
+      setData((current) => current ? {
+        ...current,
+        totalProducts: current.totalProducts + (isVisible ? -1 : 1),
+        recentProducts: current.recentProducts.map((item) => (
+          item.Id === product.Id ? { ...item, IsVisible: !isVisible } : item
+        )),
+      } : current);
+    } catch {
+      alert('Không thể cập nhật trạng thái dự án. Vui lòng thử lại.');
+    } finally {
+      setUpdatingVisibilityId(null);
+    }
+  };
 
   if (loading) return <div className="animate-pulse flex flex-col gap-8">
     <div className="h-48 bg-white/5 rounded-[28px]" />
@@ -136,14 +166,27 @@ export default function AdminDashboard() {
                      <span className="px-3 py-1 bg-white/5 rounded-full text-xs font-bold border border-white/10">{p.Year}</span>
                   </td>
                   <td className="px-8 py-6">
-                    <span className="flex items-center gap-2 text-green-500 text-sm font-bold">
-                       <CheckCircle2 size={16} /> Hiển thị
+                    <span className={`flex items-center gap-2 text-sm font-bold ${p.IsVisible !== false ? 'text-green-500' : 'text-slate-500'}`}>
+                       {p.IsVisible !== false ? <CheckCircle2 size={16} /> : <EyeOff size={16} />} {p.IsVisible !== false ? 'Hiển thị' : 'Đã ẩn'}
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <a aria-label={`Mở dự án ${p.Name}`} href={p.AppUrl} target="_blank" rel="noreferrer" className="p-2 hover:bg-white/10 rounded-lg inline-flex text-slate-400 hover:text-white transition-all">
-                       <ExternalLink size={20} />
-                    </a>
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        aria-label={p.IsVisible !== false ? `Ẩn dự án ${p.Name}` : `Hiển thị dự án ${p.Name}`}
+                        title={p.IsVisible !== false ? 'Ẩn khỏi website' : 'Hiển thị trên website'}
+                        aria-pressed={p.IsVisible !== false}
+                        disabled={updatingVisibilityId === p.Id}
+                        onClick={() => toggleVisibility(p)}
+                        className={`inline-flex rounded-lg p-2 transition-all disabled:cursor-wait disabled:opacity-50 ${p.IsVisible !== false ? 'text-green-400 hover:bg-green-400/10 hover:text-green-300' : 'text-slate-500 hover:bg-white/10 hover:text-white'}`}
+                      >
+                        {p.IsVisible !== false ? <Eye size={20} /> : <EyeOff size={20} />}
+                      </button>
+                      <a aria-label={`Mở dự án ${p.Name}`} href={p.AppUrl} target="_blank" rel="noreferrer" className="inline-flex rounded-lg p-2 text-slate-400 transition-all hover:bg-white/10 hover:text-white">
+                         <ExternalLink size={20} />
+                      </a>
+                    </div>
                   </td>
                 </tr>
               ))}

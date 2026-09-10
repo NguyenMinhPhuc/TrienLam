@@ -24,7 +24,8 @@ BEGIN
         CareerPath NVARCHAR(100) NULL,
         [Year] INT NULL DEFAULT 2026,
         CreatedAt DATETIME NULL DEFAULT GETDATE(),
-        Author NVARCHAR(MAX) NULL
+        Author NVARCHAR(MAX) NULL,
+        IsVisible BIT NOT NULL CONSTRAINT DF_Products_IsVisible DEFAULT (1)
     );
 END;
 

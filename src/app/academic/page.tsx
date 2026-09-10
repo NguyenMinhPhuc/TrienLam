@@ -17,7 +17,7 @@ async function getAcademicSections(): Promise<CustomSectionData[]> {
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const result = await execute('SELECT * FROM Products ORDER BY Year DESC, Id DESC', {});
+    const result = await execute('SELECT * FROM Products WHERE IsVisible = 1 ORDER BY Year DESC, Id DESC', {});
     return result.recordset;
   } catch (error) {
     console.error('Failed to fetch products:', error);

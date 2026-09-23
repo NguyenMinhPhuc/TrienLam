@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import { readFile } from 'fs/promises';
 import { existsSync } from 'fs';
+import { getSupabasePublicObjectUrl } from '@/lib/supabase-storage';
 
 export const runtime = 'nodejs';
 
@@ -20,6 +21,8 @@ export async function GET(
     const filePath = path.join(uploadDir, filename);
 
     if (!existsSync(filePath)) {
+      const publicUrl = getSupabasePublicObjectUrl(`uploads/${filename}`);
+      if (publicUrl) return NextResponse.redirect(publicUrl, 307);
       return new NextResponse('File not found', { status: 404 });
     }
 

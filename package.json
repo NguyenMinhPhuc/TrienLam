@@ -6,9 +6,13 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --incremental false",
     "db:migrate": "node --env-file=.env scripts/run-migrations.mjs",
-    "db:seed-academic": "node --env-file=.env scripts/seed-academic.mjs"
+    "db:seed-academic": "node --env-file=.env scripts/seed-academic.mjs",
+    "storage:check": "node --env-file=.env scripts/check-supabase-storage.mjs",
+    "storage:migrate": "node --env-file=.env scripts/migrate-public-to-supabase.mjs",
+    "storage:migrate:dry": "node scripts/migrate-public-to-supabase.mjs --dry-run"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.0",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.7.0",
     "mssql": "^12.2.1",

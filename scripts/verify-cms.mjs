@@ -84,8 +84,8 @@ try {
   const media = await upload.json();
   const filename = path.basename(media.url);
   assert.match(filename, /^[a-f0-9-]+\.png$/i);
-  uploadPath = path.resolve('public/uploads', filename);
-  check(media.url.startsWith('/api/uploads/'), 'Uploads use runtime media endpoint');
+  uploadPath = null;
+  check(media.storage === 'supabase' && media.url.includes('/storage/v1/object/public/'), 'Uploads use Supabase Storage');
   check((await fetch(base + media.url)).status === 200, 'Newly uploaded image is accessible');
   await content({ about_faculty_image: media.url });
   check((await html()).includes(media.url), 'Faculty image follows admin upload');

@@ -7,6 +7,8 @@ import { query } from '@/lib/db';
 import SiteFooter from '@/components/SiteFooter';
 import type { SiteContentRow } from '@/lib/types';
 import { contentValue } from '@/lib/site-content';
+import PublicContentRefresh from '@/components/PublicContentRefresh';
+import { SiteContentProvider } from '@/components/SiteContentContext';
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["latin", "vietnamese"],
@@ -49,7 +51,7 @@ export default async function RootLayout({
 
   const footerTitle = contentValue(content, 'footer_title');
   const footerAddress = contentValue(content, 'footer_address');
-  const footerCopy = content.footer_copy || `© ${new Date().getFullYear()} LHU Tech Hub. All rights reserved.`;
+  const footerCopy = content.footer_copy ?? `© ${new Date().getFullYear()} LHU Tech Hub. All rights reserved.`;
   const footerLayout = contentValue(content, 'footer_layout');
   const footerShowMap = content.footer_show_map === '1' || content.footer_show_map === 'true';
   const footerMapEmbed = content.footer_map_embed || '';
@@ -72,6 +74,8 @@ export default async function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <SiteContentProvider content={content}>
+          <PublicContentRefresh />
           <Navbar
             items={[
               { href: contentValue(content, 'nav_faculty_url'), label: contentValue(content, 'nav_faculty_label') },
@@ -101,6 +105,7 @@ export default async function RootLayout({
             socialEmptyText={contentValue(content, 'footer_social_empty')}
             backToTopLabel={contentValue(content, 'footer_back_to_top_label')}
           />
+          </SiteContentProvider>
         </ThemeProvider>
       </body>
     </html>

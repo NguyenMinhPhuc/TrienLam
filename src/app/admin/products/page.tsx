@@ -1,4 +1,5 @@
 "use client";
+import { adminRequest } from '@/lib/admin-request';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -17,6 +18,7 @@ import CmsImage from '@/components/CmsImage';
 export default function ProductsManager() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -30,7 +32,7 @@ export default function ProductsManager() {
     ImageUrl: '',
     AppUrl: '',
     TechTags: '',
-    CareerPath: 'AI',
+    CareerPath: 'Sản phẩm phần mềm',
     Year: new Date().getFullYear(),
     Author: '',
     IsVisible: true,
@@ -38,7 +40,7 @@ export default function ProductsManager() {
 
   const fetchProducts = async () => {
     setLoading(true);
-    const res = await fetch('/api/admin/products');
+    const res = await adminRequest('/api/admin/products');
     if (res.ok) {
       const data = await res.json();
       setProducts(data);
@@ -58,7 +60,7 @@ export default function ProductsManager() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa dự án này?')) return;
-    const res = await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
+    const res = await adminRequest(`/api/admin/products?id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchProducts();
   };
 
@@ -67,7 +69,7 @@ export default function ProductsManager() {
     setUpdatingVisibilityId(product.Id);
 
     try {
-      const res = await fetch('/api/admin/products', {
+      const res = await adminRequest('/api/admin/products', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Id: product.Id, IsVisible: !isVisible }),
@@ -93,7 +95,7 @@ export default function ProductsManager() {
     body.append('file', file);
 
     try {
-      const res = await fetch('/api/admin/upload', {
+      const res = await adminRequest('/api/admin/upload', {
         method: 'POST',
         body,
         credentials: 'include',
@@ -120,13 +122,16 @@ export default function ProductsManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const method = editingProduct ? 'PUT' : 'POST';
     
-    const res = await fetch('/api/admin/products', {
+    setSaving(true);
+    const res = await adminRequest('/api/admin/products', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
+    setSaving(false);
 
     if (res.ok) {
       setIsModalOpen(false);
@@ -137,7 +142,7 @@ export default function ProductsManager() {
         ImageUrl: '',
         AppUrl: '',
         TechTags: '',
-        CareerPath: 'AI',
+        CareerPath: 'Sản phẩm phần mềm',
         Year: new Date().getFullYear(),
         Author: '',
         IsVisible: true,
@@ -160,7 +165,7 @@ export default function ProductsManager() {
            <p className="text-slate-400">Xem, thêm mới hoặc chỉnh sửa các dự án sinh viên trên website.</p>
         </div>
         <button 
-          onClick={() => { setEditingProduct(null); setIsModalOpen(true); }}
+          onClick={() => { setEditingProduct(null); setFormData({ Name: '', Description: '', ImageUrl: '', AppUrl: '', TechTags: '', CareerPath: 'Sản phẩm phần mềm', Year: new Date().getFullYear(), Author: '', IsVisible: true }); setIsModalOpen(true); }}
           className="flex items-center gap-2 px-8 py-4 bg-lhu-blue text-white rounded-2xl font-bold shadow-xl shadow-lhu-blue/20 hover:scale-105 transition-all"
         >
           <Plus size={20} /> Thêm dự án mới
@@ -373,7 +378,7 @@ export default function ProductsManager() {
                   </div>
 
                   <div className="pt-8 flex gap-4">
-                     <button type="submit" className="flex-1 py-5 bg-lhu-orange text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-orange/20">
+                     <button type="submit" disabled={saving || isUploading} className="flex-1 py-5 bg-lhu-orange text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-orange/20">
                         {editingProduct ? 'Cập nhật thay đổi' : 'Tạo mới dự án'}
                      </button>
                   </div>

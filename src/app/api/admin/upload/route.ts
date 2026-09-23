@@ -31,8 +31,8 @@ export async function POST(request: NextRequest) {
 
     await writeFile(uploadPath, buffer);
 
-    // Files in public/uploads are served directly by Next.js.
-    const fileUrl = `/uploads/${fileName}`;
+    // Runtime uploads must also work after next build (public assets are indexed at startup).
+    const fileUrl = `/api/uploads/${fileName}`;
     return NextResponse.json({ url: fileUrl });
   } catch (err) {
     console.error('Upload Error:', err);

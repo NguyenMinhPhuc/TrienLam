@@ -39,3 +39,19 @@ export async function execute(q: string, params: Record<string, SqlParameter>) {
   });
   return request.query(q);
 }
+
+export async function executeTransaction(statements: Array<{ sql: string; params: Record<string, SqlParameter> }>) {
+  const transaction = new sql.Transaction(await connectDB());
+  await transaction.begin();
+  try {
+    for (const statement of statements) {
+      const request = new sql.Request(transaction);
+      Object.entries(statement.params).forEach(([name, value]) => request.input(name, value));
+      await request.query(statement.sql);
+    }
+    await transaction.commit();
+  } catch (error) {
+    await transaction.rollback();
+    throw error;
+  }
+}

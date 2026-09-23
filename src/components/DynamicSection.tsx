@@ -107,7 +107,7 @@ export default function DynamicSection({
 
   try {
     const parsed = JSON.parse(contentJson);
-    items = Array.isArray(parsed) ? parsed : [parsed];
+    items = (Array.isArray(parsed) ? parsed : [parsed]).filter(item => item && typeof item === 'object' && !Array.isArray(item));
   } catch (error) {
     console.error('Failed to parse section content JSON', error);
   }
@@ -120,7 +120,7 @@ export default function DynamicSection({
 
   if (layoutType === 'product-showcase') {
     return (
-      <section id={anchorId} className="public-content section-pad scroll-mt-24 overflow-hidden bg-[var(--surface-2)] dark:bg-[#091725] text-foreground dark:text-white">
+      <section id={anchorId} className={`public-content section-pad scroll-mt-24 overflow-hidden ${bgStyle === 'default' || !bgStyle ? 'bg-[var(--surface-2)] dark:bg-[#091725]' : sectionSurface} text-foreground dark:text-white`}>
         <div className="site-shell">
           <SectionIntro title={title} subtitle={subtitle} light />
           <ProductGallery products={products} />

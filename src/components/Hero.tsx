@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUpRight, PanelsTopLeft } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useSiteText } from './SiteContentContext';
 
 interface HeroProps {
   title: string;
@@ -31,11 +32,13 @@ export default function Hero({
   posterSrc,
 }: HeroProps) {
   const reduceMotion = useReducedMotion();
+  const text = useSiteText();
 
   return (
-    <section id="top" className="relative min-h-svh overflow-hidden bg-[#07111d] text-white">
+    <section id="top" className="hero-section relative overflow-hidden bg-[#07111d] text-white md:min-h-svh">
       <div className="absolute inset-0" aria-hidden="true">
         <video
+          key={videoSrc}
           className="hero-video size-full object-cover opacity-60"
           autoPlay={!reduceMotion}
           muted
@@ -50,28 +53,28 @@ export default function Hero({
         <div className="hero-grid absolute inset-0 opacity-70" />
       </div>
 
-      <div className="site-shell relative z-10 flex min-h-svh items-end pb-14 pt-32 md:items-center md:pb-24 md:pt-40">
+      <div className="hero-content site-shell relative z-10 flex items-start md:min-h-svh md:items-center md:pb-24 md:pt-40">
         <div className="grid w-full items-end gap-12 lg:grid-cols-[minmax(0,1.35fr)_minmax(18rem,.65fr)]">
           <div className="max-w-5xl">
             <motion.h1
               initial={reduceMotion ? false : { opacity: 0, y: 32, filter: 'blur(6px)' }}
               animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
               transition={reduceMotion ? { duration: 0 } : { duration: 0.72, ease }}
-              className="font-display max-w-[17ch] text-[clamp(2.3rem,6.2vw,4.5rem)] font-[650] leading-[1.14] tracking-[-0.012em] [&_.gradient-text]:block [&_br]:hidden"
+              className="hero-heading font-display max-w-[17ch] text-[clamp(2.3rem,6.2vw,4.5rem)] font-[650] leading-[1.14] tracking-[-0.012em] [&_.gradient-text]:block [&_br]:hidden"
               dangerouslySetInnerHTML={{ __html: title }}
             />
             <motion.p
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.16, ease }}
-              className="mt-7 max-w-2xl text-base leading-8 text-[#c0cfdb] md:mt-9 md:text-xl md:leading-9"
+              className="hero-copy mt-7 max-w-2xl text-base leading-8 text-[#c0cfdb] md:mt-9 md:text-xl md:leading-9"
               dangerouslySetInnerHTML={{ __html: subtitle }}
             />
             <motion.div
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.28, ease }}
-              className="mt-9 flex flex-col gap-3 sm:flex-row"
+              className="hero-actions mt-9 flex flex-col gap-3 sm:flex-row"
             >
               <a href={productsUrl} className="button-secondary border-white/20 bg-white/7 text-white hover:bg-white/12">
                 <PanelsTopLeft size={17} aria-hidden="true" />
@@ -98,14 +101,14 @@ export default function Hero({
               </div>
               <div className="hero-orbit-core absolute inset-[28%] grid place-items-center rounded-full bg-[#0a1724]/82 shadow-[0_24px_70px_-26px_rgba(0,0,0,.9)] backdrop-blur-md">
                 <div className="text-center">
-                  <span className="font-display text-4xl font-extrabold tracking-[-0.04em] text-lhu-orange">LHU</span>
-                  <span className="mt-1 block text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#b9c9d6]">Tech Hub</span>
+                  <span className="font-display text-4xl font-extrabold tracking-[-0.04em] text-lhu-orange">{text('hero_orbit_title')}</span>
+                  <span className="mt-1 block text-[0.65rem] font-bold uppercase tracking-[0.25em] text-[#b9c9d6]">{text('hero_orbit_subtitle')}</span>
                 </div>
               </div>
               <div className="hero-orbit-topics absolute inset-[4%]">
-                {['AI', 'SOFTWARE', 'NETWORK', 'IoT'].map((label, index) => (
+                {text('hero_orbit_topics').split('\n').filter(Boolean).slice(0, 4).map((label, index) => (
                   <span
-                    key={label}
+                    key={index}
                     className={`hero-orbit-label absolute whitespace-nowrap rounded-full border border-lhu-blue/30 bg-[#08131f]/95 px-3 py-1.5 text-[0.65rem] font-bold tracking-[0.14em] text-[#d7e2ea] ${[
                       'left-[6.7%] top-[25%]',
                       'left-[85.35%] top-[14.65%]',
@@ -124,11 +127,11 @@ export default function Hero({
 
       <motion.a
         href={scrollUrl}
-        aria-label="Xem phần thống kê"
+        aria-label={scrollLabel}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9 }}
-        className="absolute bottom-5 right-5 z-20 hidden items-center gap-3 text-xs font-semibold text-[#aebfcd] md:flex"
+        className="hero-scroll absolute bottom-5 right-5 z-20 hidden items-center gap-3 text-xs font-semibold text-[#aebfcd] md:flex"
       >
         {scrollLabel}
         <span className="grid size-9 place-items-center rounded-full border border-white/15">

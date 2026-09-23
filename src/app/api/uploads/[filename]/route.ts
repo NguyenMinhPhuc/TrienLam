@@ -33,6 +33,9 @@ export async function GET(
     else if (ext === '.gif') contentType = 'image/gif';
     else if (ext === '.webp') contentType = 'image/webp';
     else if (ext === '.svg') contentType = 'image/svg+xml';
+    else if (ext === '.avif') contentType = 'image/avif';
+    else if (ext === '.mp4') contentType = 'video/mp4';
+    else if (ext === '.webm') contentType = 'video/webm';
 
     return new NextResponse(fileBuffer, {
       status: 200,

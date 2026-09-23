@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } fr
 import { Cpu, Globe, LayoutGrid, Monitor, Settings } from 'lucide-react';
 import { useRef, useState } from 'react';
 import ProductCard, { Product } from './ProductCard';
+import { useSiteText } from './SiteContentContext';
 
 interface ProductGalleryProps {
   products: Product[];
@@ -36,6 +37,7 @@ function FeaturedProject({ product, index }: { product: Product; index: number }
 }
 
 export default function ProductGallery({ products }: ProductGalleryProps) {
+  const text = useSiteText();
   const [activeTab, setActiveTab] = useState('all');
   const filteredProducts = activeTab === 'all' ? products : products.filter((product) => product.CareerPath === activeTab);
   const featured = filteredProducts.slice(0, 3);
@@ -79,7 +81,7 @@ export default function ProductGallery({ products }: ProductGalleryProps) {
 
               {remaining.length > 0 && (
                 <div className="mt-8 border-t border-card-border dark:border-white/10 pt-16">
-                  <h3 className="font-display mb-9 text-2xl font-bold tracking-[-0.012em] text-foreground dark:text-white">Khám phá thêm dự án</h3>
+                  <h3 className="font-display mb-9 text-2xl font-bold tracking-[-0.012em] text-foreground dark:text-white">{text('products_more_title')}</h3>
                   <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                     {remaining.map((product) => <ProductCard key={product.Id} product={product} />)}
                   </div>

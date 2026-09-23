@@ -1,4 +1,5 @@
 "use client";
+import { adminRequest } from '@/lib/admin-request';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -59,6 +60,9 @@ export default function QuizManager() {
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+  const [isIndustryModalOpen, setIsIndustryModalOpen] = useState(false);
+  const [industryForm, setIndustryForm] = useState<Partial<Industry>>({ IndustryKey: '', Title: '', Description: '' });
+  const [saving, setSaving] = useState(false);
 
   // Editing States
   const [editingQuestion, setEditingQuestion] = useState<QuizQuestion | null>(null);
@@ -69,7 +73,7 @@ export default function QuizManager() {
   const [rFormData, setRFormData] = useState<Partial<QuizResult>>({ ResultKey: '', Title: '', Description: '', IconName: 'MessageSquare' });
 
   const fetchData = async () => {
-    const res = await fetch('/api/admin/quiz');
+    const res = await adminRequest('/api/admin/quiz');
     if (res.ok) {
         const data = await res.json();
         setQuestions(data.questions);
@@ -83,7 +87,7 @@ export default function QuizManager() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch('/api/admin/quiz')
+    adminRequest('/api/admin/quiz')
       .then(async (res) => res.ok ? res.json() : null)
       .then((data) => {
         if (cancelled || !data) return;
@@ -106,28 +110,32 @@ export default function QuizManager() {
   }
 
   const handleSubmit = async (
-    type: 'question' | 'option' | 'result',
-    data: Partial<QuizQuestion> | Partial<QuizOption> | Partial<QuizResult>,
+    type: 'question' | 'option' | 'result' | 'industry',
+    data: Partial<QuizQuestion> | Partial<QuizOption> | Partial<QuizResult> | Partial<Industry>,
     isEdit: boolean,
   ) => {
+    if (saving) return;
+    setSaving(true);
     const method = isEdit ? 'PUT' : 'POST';
-    const res = await fetch('/api/admin/quiz', {
+    const res = await adminRequest('/api/admin/quiz', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, ...data })
     });
 
+    setSaving(false);
     if (res.ok) {
       if (type === 'question') setIsQuestionModalOpen(false);
       if (type === 'option') setIsOptionModalOpen(false);
       if (type === 'result') setIsResultModalOpen(false);
+      if (type === 'industry') setIsIndustryModalOpen(false);
       fetchData();
     }
   };
 
   const handleDelete = async (type: string, id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa mục này?')) return;
-    const res = await fetch(`/api/admin/quiz?type=${type}&id=${id}`, { method: 'DELETE' });
+    const res = await adminRequest(`/api/admin/quiz?type=${type}&id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchData();
   };
 
@@ -145,7 +153,7 @@ export default function QuizManager() {
       <section className="space-y-6">
          <div className="flex justify-between items-center bg-white/5 p-6 rounded-3xl border border-white/10">
             <h2 className="text-xl font-bold flex items-center gap-3"><Trophy className="text-lhu-orange" /> Kết quả trắc nghiệm</h2>
-            <p className="text-xs text-slate-500 uppercase tracking-widest font-black">AI • Frontend • Backend</p>
+            <button type="button" onClick={() => { setRFormData({ ResultKey: '', Title: '', Description: '', IconName: 'Briefcase', IndustryKey: '' }); setIsResultModalOpen(true); }} className="rounded-xl bg-lhu-blue px-4 py-2 text-sm font-bold text-white">Thêm kết quả</button>
          </div>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {results.map((r) => (
@@ -156,6 +164,7 @@ export default function QuizManager() {
                      </div>
                       <button aria-label={`Sửa kết quả ${r.Title}`} onClick={() => { setRFormData(r); setIsResultModalOpen(true); }} className="p-2 hover:bg-white/10 rounded-lg text-slate-500 hover:text-white"><Edit2 size={18} /></button>
                   </div>
+                  <button type="button" aria-label={`Xóa kết quả ${r.Title}`} onClick={() => void handleDelete('result', r.Id)} className="mb-4 rounded-lg p-2 text-red-300 hover:bg-white/10"><Trash2 size={18} /></button>
                   <h3 className="text-xl font-bold text-white mb-2">{r.Title}</h3>
                   <p className="text-xs text-slate-500 leading-relaxed line-clamp-2">{r.Description}</p>
                </div>
@@ -163,6 +172,19 @@ export default function QuizManager() {
          </div>
       </section>
 
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xl font-bold text-white">Ngành gợi ý</h2>
+          <button type="button" onClick={() => { setIndustryForm({ IndustryKey: '', Title: '', Description: '' }); setIsIndustryModalOpen(true); }} className="rounded-xl bg-lhu-blue px-4 py-2 text-sm font-bold text-white">Thêm ngành</button>
+        </div>
+        {industries.map(industry => (
+          <div key={industry.Id} className="flex items-center gap-3 rounded-xl border border-white/10 p-4">
+            <div className="min-w-0 flex-1"><p className="font-semibold text-white">{industry.Title}</p><p className="text-sm text-slate-400">{industry.Description}</p></div>
+            <button type="button" aria-label={`Sửa ngành ${industry.Title}`} onClick={() => { setIndustryForm(industry); setIsIndustryModalOpen(true); }} className="p-3 text-slate-300"><Edit2 size={18} /></button>
+            <button type="button" aria-label={`Xóa ngành ${industry.Title}`} onClick={() => void handleDelete('industry', industry.Id)} className="p-3 text-red-300"><Trash2 size={18} /></button>
+          </div>
+        ))}
+      </section>
       {/* Questions Section */}
       <section className="space-y-6">
          <div className="flex justify-between items-center bg-white/5 p-6 rounded-3xl border border-white/10">
@@ -198,7 +220,7 @@ export default function QuizManager() {
                            </div>
                         </div>
                      ))}
-                     <button onClick={() => { setEditingOption(null); setOFormData({ QuestionId: q.Id, OptionText: '', ResultType: 'AI', OrderIndex: 0 }); setIsOptionModalOpen(true); }} className="border border-dashed border-white/20 p-4 rounded-2xl flex items-center justify-center gap-2 text-slate-500 hover:text-white hover:border-white/40 transition-all text-xs font-bold">
+                     <button onClick={() => { setEditingOption(null); setOFormData({ QuestionId: q.Id, OptionText: '', ResultType: results[0]?.ResultKey || '', OrderIndex: 0 }); setIsOptionModalOpen(true); }} className="border border-dashed border-white/20 p-4 rounded-2xl flex items-center justify-center gap-2 text-slate-500 hover:text-white hover:border-white/40 transition-all text-xs font-bold">
                         <Plus size={16} /> Thêm lựa chọn
                      </button>
                   </div>
@@ -221,7 +243,7 @@ export default function QuizManager() {
                    <label htmlFor="quiz-question-order" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Thứ tự hiển thị</label>
                    <input id="quiz-question-order" type="number" required value={qFormData.OrderIndex} onChange={e => setQFormData({...qFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
-                <button type="submit" className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold">Xác nhận</button>
+                <button type="submit" disabled={saving} className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold">Xác nhận</button>
              </form>
           </ModalWrapper>
         )}
@@ -237,9 +259,8 @@ export default function QuizManager() {
                   <div className="space-y-2">
                      <label htmlFor="quiz-option-result" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Loại nghề nghiệp</label>
                      <select id="quiz-option-result" value={oFormData.ResultType} onChange={e => setOFormData({...oFormData, ResultType: e.target.value})} className="w-full p-4 bg-slate-800 border border-white/10 rounded-2xl text-white">
-                        <option value="AI">AI Specialist</option>
-                        <option value="Frontend">Frontend Developer</option>
-                        <option value="Backend">Backend/Data Scientist</option>
+                        <option value="">Chọn kết quả</option>
+                        {results.map(result => <option key={result.Id} value={result.ResultKey}>{result.Title}</option>)}
                     </select>
                   </div>
                   <div className="space-y-2">
@@ -247,15 +268,17 @@ export default function QuizManager() {
                      <input id="quiz-option-order" type="number" required value={oFormData.OrderIndex} onChange={e => setOFormData({...oFormData, OrderIndex: parseInt(e.target.value)})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white" />
                   </div>
                 </div>
-                <button type="submit" className="w-full py-5 bg-lhu-orange text-white rounded-2xl font-bold">Lưu lựa chọn</button>
+                <button type="submit" disabled={saving} className="w-full py-5 bg-lhu-orange text-white rounded-2xl font-bold">Lưu lựa chọn</button>
              </form>
           </ModalWrapper>
         )}
 
         {isResultModalOpen && (
-          <ModalWrapper title="Sửa kết quả trắc nghiệm" onClose={() => setIsResultModalOpen(false)}>
-             <form onSubmit={(e) => { e.preventDefault(); handleSubmit('result', rFormData, true); }} className="space-y-6">
+          <ModalWrapper title={rFormData.Id ? "Sửa kết quả trắc nghiệm" : "Thêm kết quả trắc nghiệm"} onClose={() => setIsResultModalOpen(false)}>
+             <form onSubmit={(e) => { e.preventDefault(); handleSubmit('result', rFormData, Boolean(rFormData.Id)); }} className="space-y-6">
                 <div className="space-y-2">
+                   <label htmlFor="quiz-result-key" className="block text-sm text-slate-400">Mã kết quả (không đổi sau khi tạo)</label>
+                   <input id="quiz-result-key" required disabled={Boolean(rFormData.Id)} value={rFormData.ResultKey || ''} onChange={e => setRFormData({ ...rFormData, ResultKey: e.target.value })} pattern="[A-Za-z0-9_-]{1,50}" className="w-full rounded-xl border border-white/10 bg-white/5 p-4 text-white disabled:opacity-60" />
                    <label htmlFor="quiz-result-title" className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Tên nghề nghiệp</label>
                    <input id="quiz-result-title" required type="text" value={rFormData.Title} onChange={e => setRFormData({...rFormData, Title: e.target.value})} className="w-full p-4 bg-white/5 border border-white/10 rounded-2xl text-white outline-none focus:border-lhu-blue transition-all" />
                 </div>
@@ -284,8 +307,24 @@ export default function QuizManager() {
                       ))}
                    </select>
                 </div>
-                <button type="submit" className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold tracking-widest">CẬP NHẬT KẾT QUẢ</button>
+                <button type="submit" disabled={saving} className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold tracking-widest">CẬP NHẬT KẾT QUẢ</button>
              </form>
+          </ModalWrapper>
+        )}
+        {isIndustryModalOpen && (
+          <ModalWrapper title={industryForm.Id ? 'Sửa ngành gợi ý' : 'Thêm ngành gợi ý'} onClose={() => setIsIndustryModalOpen(false)}>
+            <form onSubmit={e => { e.preventDefault(); void handleSubmit('industry', industryForm, Boolean(industryForm.Id)); }} className="space-y-5">
+              <label className="block text-sm text-slate-300">Mã ngành (không đổi sau khi tạo)
+                <input required disabled={Boolean(industryForm.Id)} pattern="[A-Za-z0-9_-]{1,50}" value={industryForm.IndustryKey || ''} onChange={e => setIndustryForm({ ...industryForm, IndustryKey: e.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-base text-white disabled:opacity-60" />
+              </label>
+              <label className="block text-sm text-slate-300">Tên ngành
+                <input required value={industryForm.Title || ''} onChange={e => setIndustryForm({ ...industryForm, Title: e.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-base text-white" />
+              </label>
+              <label className="block text-sm text-slate-300">Mô tả
+                <textarea rows={3} value={industryForm.Description || ''} onChange={e => setIndustryForm({ ...industryForm, Description: e.target.value })} className="mt-2 w-full rounded-xl border border-white/10 bg-white/5 p-4 text-base text-white" />
+              </label>
+              <button type="submit" disabled={saving} className="w-full rounded-xl bg-lhu-blue py-4 font-bold text-white disabled:opacity-50">{saving ? 'Đang lưu...' : 'Lưu ngành'}</button>
+            </form>
           </ModalWrapper>
         )}
       </AnimatePresence>

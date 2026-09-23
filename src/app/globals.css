@@ -477,12 +477,109 @@ a {
     padding-block: 5rem;
   }
 
+  /* Fill the visible screen, keep the copy near the top, and let long CMS content grow. */
+  .hero-section {
+    --hero-gutter: clamp(1.25rem, 6vw, 1.75rem);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
+  }
+
+  .hero-content,
+  .hero-scroll {
+    width: calc(100% - var(--hero-gutter) * 2);
+  }
+
+  .site-nav-shell {
+    width: calc(100% - clamp(1.25rem, 6vw, 1.75rem) * 2);
+  }
+
+  .hero-content {
+    flex-shrink: 0;
+    min-height: 0;
+    padding-top: calc(7.5rem + env(safe-area-inset-top, 0px));
+    padding-bottom: 2rem;
+  }
+
+  .hero-content > div,
+  .hero-content > div > div {
+    min-width: 0;
+  }
+
+  .hero-heading {
+    max-width: 100%;
+    font-size: clamp(2rem, 8vw, 2.625rem);
+    line-height: 1.24;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+    overflow-wrap: break-word;
+  }
+
+  .hero-heading .gradient-text {
+    margin-top: 0.15em;
+    text-wrap: balance;
+  }
+
+  .hero-copy {
+    max-width: 38ch;
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    line-height: 1.85;
+    text-wrap: pretty;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-actions {
+    margin-top: 1.75rem;
+    gap: 0.75rem;
+  }
+
+  .hero-actions > a {
+    min-width: 0;
+    min-height: 3.375rem;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-actions > a > svg {
+    flex-shrink: 0;
+  }
+
+  .hero-actions .button-secondary {
+    border-color: rgba(191, 208, 220, 0.25);
+    background: rgba(13, 27, 41, 0.85);
+    color: #f4f8fb;
+  }
+
+  .hero-scroll {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: space-between;
+    margin-top: auto;
+    margin-inline: auto;
+    padding-top: 1rem;
+    padding-bottom: max(1.75rem, env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid rgba(191, 208, 220, 0.14);
+  }
+
+  .hero-video {
+    object-position: 65% center;
+  }
+
   .hero-vignette {
-    background: linear-gradient(0deg, #07111d 0%, rgba(7, 17, 29, 0.8) 52%, rgba(7, 17, 29, 0.6) 100%);
+    background: linear-gradient(180deg, rgba(7, 17, 29, 0.68) 0%, rgba(7, 17, 29, 0.9) 34%, rgba(7, 17, 29, 0.94) 76%, #07111d 100%);
   }
 
   .hero-grid {
     background-size: 50% 100%;
+    opacity: 0.35;
   }
 }
 

@@ -20,6 +20,20 @@ export interface SiteContentGroupDefinition {
  * database row therefore never changes the existing appearance or copy.
  */
 export const SITE_CONTENT_DEFAULTS = {
+  brand_first: 'LHU',
+  brand_second: 'TECH HUB',
+  brand_logo_src: '',
+  brand_logo_alt: 'LHU Tech Hub',
+  hero_orbit_title: 'LHU',
+  hero_orbit_subtitle: 'Tech Hub',
+  hero_orbit_topics: 'AI\nSOFTWARE\nNETWORK\nIoT',
+  products_more_title: 'Khám phá thêm dự án',
+  academic_title: 'Ngành Công nghệ <span class="text-lhu-orange">Thông tin</span>',
+  academic_description: 'Kiến tạo tương lai, làm chủ công nghệ và dẫn đầu thời đại số cùng Đại học Lạc Hồng.',
+  academic_cta_title: 'Sẵn sàng trở thành kỹ sư CNTT thế hệ mới?',
+  academic_cta_description: 'Đăng ký xét tuyển để tìm hiểu chương trình đào tạo và môi trường học tập thực chiến tại Đại học Lạc Hồng.',
+  academic_cta_label: 'Đăng ký xét tuyển →',
+  academic_cta_url: 'https://tuyensinh.lhu.edu.vn',
   nav_faculty_label: 'Khoa CNTT',
   nav_faculty_url: '/#faculty',
   nav_academic_label: 'Ngành đào tạo',
@@ -108,6 +122,26 @@ export type SiteContentKey = keyof typeof SITE_CONTENT_DEFAULTS;
 
 export const SITE_CONTENT_GROUPS: SiteContentGroupDefinition[] = [
   {
+    id: 'brand', title: 'Logo & nhận diện', description: 'Logo được dùng chung ở đầu và cuối trang. Để trống ảnh để dùng logo chữ hiện tại.',
+    fields: [
+      { key: 'brand_first', label: 'Phần chữ đầu của logo', type: 'text' },
+      { key: 'brand_second', label: 'Phần chữ sau của logo', type: 'text' },
+      { key: 'brand_logo_src', label: 'Ảnh logo thay thế (tùy chọn)', type: 'image' },
+      { key: 'brand_logo_alt', label: 'Mô tả logo', type: 'text' },
+    ],
+  },
+  {
+    id: 'academic', title: 'Trang ngành đào tạo', description: 'Phần mở đầu và lời mời đăng ký. Các khung nội dung ở giữa được quản lý tại Khung động → Ngành đào tạo.',
+    fields: [
+      { key: 'academic_title', label: 'Tiêu đề mở đầu', type: 'html' },
+      { key: 'academic_description', label: 'Mô tả mở đầu', type: 'textarea' },
+      { key: 'academic_cta_title', label: 'Tiêu đề đăng ký', type: 'text' },
+      { key: 'academic_cta_description', label: 'Mô tả đăng ký', type: 'textarea' },
+      { key: 'academic_cta_label', label: 'Nhãn nút đăng ký', type: 'text' },
+      { key: 'academic_cta_url', label: 'Đường dẫn đăng ký', type: 'url' },
+    ],
+  },
+  {
     id: 'navigation',
     title: 'Thanh điều hướng',
     description: 'Tên và đường dẫn của các mục trên thanh menu ở đầu trang.',
@@ -139,6 +173,9 @@ export const SITE_CONTENT_GROUPS: SiteContentGroupDefinition[] = [
       { key: 'hero_scroll_url', label: 'Đường dẫn cuộn xuống', type: 'url' },
       { key: 'hero_video_src', label: 'Đường dẫn video nền', description: 'Nhập đường dẫn trong /public hoặc URL video.', type: 'url' },
       { key: 'hero_poster_src', label: 'Ảnh chờ của video', type: 'image' },
+      { key: 'hero_orbit_title', label: 'Chữ chính giữa vòng công nghệ', type: 'text' },
+      { key: 'hero_orbit_subtitle', label: 'Chữ phụ giữa vòng công nghệ', type: 'text' },
+      { key: 'hero_orbit_topics', label: 'Nhãn quanh vòng công nghệ', description: 'Tối đa 4 nhãn, mỗi nhãn một dòng.', type: 'textarea', rows: 4 },
     ],
   },
   {
@@ -170,9 +207,10 @@ export const SITE_CONTENT_GROUPS: SiteContentGroupDefinition[] = [
   {
     id: 'products',
     title: 'Khu vực sản phẩm',
-    description: 'Tiêu đề và lời dẫn của danh sách sản phẩm. Dự án và ảnh dự án được quản lý tại mục Sản phẩm.',
+    description: 'Tiêu đề và lời dẫn của khu vực sản phẩm mặc định. Nếu dùng khung “Danh sách sản phẩm động”, sửa tiêu đề và phụ đề tại Khung động. Dự án và ảnh dự án được quản lý tại mục Sản phẩm.',
     fields: [
       { key: 'products_title', label: 'Tiêu đề khu vực sản phẩm', type: 'text' },
+      { key: 'products_more_title', label: 'Tiêu đề danh sách dự án tiếp theo', type: 'text' },
       { key: 'products_description', label: 'Mô tả khu vực sản phẩm', type: 'textarea', rows: 4 },
     ],
   },
@@ -245,5 +283,5 @@ export const SITE_CONTENT_GROUPS: SiteContentGroupDefinition[] = [
 ];
 
 export function contentValue(content: Record<string, string>, key: SiteContentKey): string {
-  return content[key] || SITE_CONTENT_DEFAULTS[key];
+  return content[key] ?? SITE_CONTENT_DEFAULTS[key];
 }

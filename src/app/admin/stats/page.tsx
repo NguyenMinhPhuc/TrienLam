@@ -1,4 +1,5 @@
 "use client";
+import { adminRequest } from '@/lib/admin-request';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
@@ -22,6 +23,7 @@ const ICON_OPTIONS = [
 export default function StatsManager() {
   const [stats, setStats] = useState<Stat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStat, setEditingStat] = useState<Stat | null>(null);
 
@@ -33,7 +35,7 @@ export default function StatsManager() {
   });
 
   const fetchStats = async () => {
-    const res = await fetch('/api/admin/stats');
+    const res = await adminRequest('/api/admin/stats');
     if (res.ok) {
         const data = await res.json();
         setStats(data);
@@ -44,7 +46,7 @@ export default function StatsManager() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch('/api/admin/stats')
+    adminRequest('/api/admin/stats')
       .then(async (res) => res.ok ? res.json() as Promise<Stat[]> : [])
       .then((data) => {
         if (!cancelled) setStats(data);
@@ -66,18 +68,21 @@ export default function StatsManager() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa chỉ số này?')) return;
-    const res = await fetch(`/api/admin/stats?id=${id}`, { method: 'DELETE' });
+    const res = await adminRequest(`/api/admin/stats?id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchStats();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const method = editingStat ? 'PUT' : 'POST';
-    const res = await fetch('/api/admin/stats', {
+    setSaving(true);
+    const res = await adminRequest('/api/admin/stats', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
+    setSaving(false);
 
     if (res.ok) {
       setIsModalOpen(false);
@@ -96,7 +101,7 @@ export default function StatsManager() {
            <p className="text-slate-400">Cập nhật các thống kê thực tế về dự án, sinh viên và thành tích.</p>
         </div>
         <button 
-          onClick={() => { setEditingStat(null); setIsModalOpen(true); }}
+          onClick={() => { setEditingStat(null); setFormData({ Label: '', Value: '', IconName: 'Rocket', OrderIndex: stats.length }); setIsModalOpen(true); }}
           className="flex items-center gap-2 px-8 py-4 bg-lhu-blue text-white rounded-2xl font-bold shadow-xl shadow-lhu-blue/20 hover:scale-105 transition-all"
         >
           <Plus size={20} /> Thêm chỉ số
@@ -199,7 +204,7 @@ export default function StatsManager() {
                       </div>
                   </div>
 
-                  <button type="submit" className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-blue/20 mt-4">
+                  <button type="submit" disabled={saving} className="w-full py-5 bg-lhu-blue text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-blue/20 mt-4">
                      Xác nhận lưu
                   </button>
                </form>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cmsResponse } from '@/lib/cms-response';
 import { query, execute } from '@/lib/db';
 
 export async function GET() {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       { Label, Value, IconName, OrderIndex }
     );
 
-    return NextResponse.json({ message: 'Stat created successfully' });
+    return cmsResponse({ message: 'Stat created successfully' });
   } catch {
     return NextResponse.json({ error: 'Insert failed' }, { status: 500 });
   }
@@ -36,7 +37,7 @@ export async function PUT(req: NextRequest) {
       { Id, Label, Value, IconName, OrderIndex }
     );
 
-    return NextResponse.json({ message: 'Stat updated successfully' });
+    return cmsResponse({ message: 'Stat updated successfully' });
   } catch {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
   }
@@ -50,7 +51,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'Id required' }, { status: 400 });
 
     await execute('DELETE FROM Stats WHERE Id = @id', { id: parseInt(id) });
-    return NextResponse.json({ message: 'Stat deleted successfully' });
+    return cmsResponse({ message: 'Stat deleted successfully' });
   } catch {
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
   }

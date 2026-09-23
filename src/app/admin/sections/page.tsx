@@ -1,4 +1,5 @@
 "use client";
+import { adminRequest } from '@/lib/admin-request';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -115,6 +116,7 @@ export default function SectionsManager() {
   const [sections, setSections] = useState<Section[]>([]);
   const [activePage, setActivePage] = useState<'home' | 'academic' | 'all'>('home');
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSection, setEditingSection] = useState<Section | null>(null);
 
@@ -171,7 +173,7 @@ export default function SectionsManager() {
     try {
       const body = new FormData();
       body.append('file', file);
-      const response = await fetch('/api/admin/upload', {
+      const response = await adminRequest('/api/admin/upload', {
         method: 'POST',
         body,
         credentials: 'include',
@@ -189,7 +191,7 @@ export default function SectionsManager() {
   };
 
   const fetchSections = async (page: string) => {
-    const res = await fetch(`/api/admin/sections?pageKey=${page}`);
+    const res = await adminRequest(`/api/admin/sections?pageKey=${page}`);
     if (res.ok) {
       const data = await res.json();
       setSections(data);
@@ -200,7 +202,7 @@ export default function SectionsManager() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/admin/sections?pageKey=${activePage}`)
+    adminRequest(`/api/admin/sections?pageKey=${activePage}`)
       .then(async (res) => res.ok ? res.json() as Promise<Section[]> : [])
       .then((data) => {
         if (!cancelled) setSections(data);
@@ -219,7 +221,7 @@ export default function SectionsManager() {
     setFormData({ ...section, PageKey: section.PageKey || 'home' });
     try {
         const items = JSON.parse(section.ContentJson || '[]');
-        setContentItems(Array.isArray(items) ? items : []);
+        setContentItems(Array.isArray(items) ? items : items && typeof items === 'object' ? [items] : []);
     } catch {
         setContentItems([]);
     }
@@ -246,12 +248,13 @@ export default function SectionsManager() {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa section này?')) return;
-    const res = await fetch(`/api/admin/sections?id=${id}`, { method: 'DELETE' });
+    const res = await adminRequest(`/api/admin/sections?id=${id}`, { method: 'DELETE' });
     if (res.ok) fetchSections(activePage);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (saving) return;
     const method = editingSection ? 'PUT' : 'POST';
     
     // Validate JSON
@@ -262,11 +265,13 @@ export default function SectionsManager() {
         return;
     }
 
-    const res = await fetch('/api/admin/sections', {
+    setSaving(true);
+    const res = await adminRequest('/api/admin/sections', {
       method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
     });
+    setSaving(false);
 
     if (res.ok) {
       setIsModalOpen(false);
@@ -487,8 +492,10 @@ export default function SectionsManager() {
                             onClick={() => {
                                try {
                                    const items = JSON.parse(formData.ContentJson || '[]');
-                                   if (Array.isArray(items)) setContentItems(items);
-                               } catch {}
+                                   const normalized = Array.isArray(items) ? items : [items];
+                                   if (normalized.some(item => !item || typeof item !== 'object' || Array.isArray(item))) throw new Error();
+                                   setContentItems(normalized);
+                               } catch { alert('JSON không hợp lệ. Hãy sửa trước khi chuyển sang chế độ trực quan.'); return; }
                                setEditorMode('visual');
                             }}
                             className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${editorMode === 'visual' ? 'bg-lhu-blue text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
@@ -511,7 +518,9 @@ export default function SectionsManager() {
                             exit={{ opacity: 0, x: 20 }}
                             className="space-y-4"
                           >
-                             {formData.LayoutType === 'script-embed' ? (
+                             {formData.LayoutType === 'product-showcase' ? (
+                               <p className="rounded-xl border border-white/10 p-5 text-sm leading-6 text-slate-300">Khung này lấy dự án và ảnh trực tiếp từ mục Sản phẩm. Sửa tiêu đề/phụ đề ở trên; thêm, xóa, ẩn/hiện dự án tại <a href="/admin/products" className="text-lhu-blue underline">Quản lý sản phẩm</a>.</p>
+                             ) : formData.LayoutType === 'script-embed' ? (
                                 <div className="space-y-6 bg-white/5 border border-white/10 p-8 rounded-3xl">
                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                       <div className="space-y-2">
@@ -724,7 +733,7 @@ export default function SectionsManager() {
                   </div>
 
                   <div className="pt-8 flex gap-4">
-                     <button type="submit" className="flex-1 py-5 bg-lhu-blue text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-blue/20">
+                     <button type="submit" disabled={saving || uploadingItem !== null} className="flex-1 py-5 bg-lhu-blue text-white rounded-2xl font-bold text-lg hover:scale-[1.02] transition-all shadow-xl shadow-lhu-blue/20">
                         {editingSection ? 'Lưu thay đổi' : 'Xác nhận tạo khung'}
                      </button>
                   </div>

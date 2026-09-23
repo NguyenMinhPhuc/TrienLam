@@ -53,9 +53,9 @@ export default function ContactSection({ title, description, address, phone, ema
   };
 
   const contactItems = [
-    { label: 'Địa chỉ', value: address || 'Đang cập nhật...', icon: MapPin },
-    { label: 'Hotline', value: phone || 'Đang cập nhật...', icon: Phone },
-    { label: 'Email', value: email || 'Đang cập nhật...', icon: Mail },
+    { label: 'Địa chỉ', value: address ?? 'Đang cập nhật...', icon: MapPin },
+    { label: 'Hotline', value: phone ?? 'Đang cập nhật...', icon: Phone },
+    { label: 'Email', value: email ?? 'Đang cập nhật...', icon: Mail },
   ];
 
   return (

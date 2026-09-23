@@ -65,7 +65,11 @@ export default function CareerQuiz({
   const [scores, setScores] = useState<Record<string, number>>({});
   const [winner, setWinner] = useState<string | null>(null);
   const [industryWinner, setIndustryWinner] = useState<string | null>(null);
-  const { questions, results, industries } = quizData;
+  const { results, industries } = quizData;
+  // Incomplete draft questions must not trap visitors on a question with no valid answer.
+  const questions = quizData.questions.map(question => ({
+    ...question, Options: question.Options.filter(option => Boolean(results[option.ResultType])),
+  })).filter(question => question.Options.length > 0);
 
   const calculateWinner = (finalScores: Record<string, number>) => {
     const winningType = Object.entries(finalScores).reduce<string | null>((best, [type, score]) => {

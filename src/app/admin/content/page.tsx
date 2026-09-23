@@ -1,4 +1,5 @@
 "use client";
+import { adminRequest } from '@/lib/admin-request';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -13,6 +14,7 @@ import {
   Save,
 } from 'lucide-react';
 import CmsImage from '@/components/CmsImage';
+import HomeLayoutEditor from '@/components/HomeLayoutEditor';
 import {
   SITE_CONTENT_DEFAULTS,
   SITE_CONTENT_GROUPS,
@@ -46,7 +48,7 @@ export default function ContentManager() {
 
     async function loadContent() {
       try {
-        const response = await fetch('/api/admin/content');
+        const response = await adminRequest('/api/admin/content');
         if (!response.ok) throw new Error('Không thể tải nội dung từ máy chủ.');
         const rows = await response.json() as ContentItem[];
         if (cancelled) return;
@@ -80,7 +82,7 @@ export default function ContentManager() {
     setMessage('');
 
     try {
-      const response = await fetch('/api/admin/content', {
+      const response = await adminRequest('/api/admin/content', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -114,7 +116,7 @@ export default function ContentManager() {
     try {
       const body = new FormData();
       body.append('file', file);
-      const response = await fetch('/api/admin/upload', {
+      const response = await adminRequest('/api/admin/upload', {
         method: 'POST',
         body,
         credentials: 'include',
@@ -161,6 +163,7 @@ export default function ContentManager() {
         </div>
       )}
 
+      <HomeLayoutEditor />
       <section aria-labelledby="specialist-heading">
         <div className="mb-5 flex items-center gap-3">
           <FileText className="text-lhu-blue" size={22} aria-hidden="true" />
@@ -271,6 +274,7 @@ function ContentField({ field, value, dirty, saving, saved, uploading, onChange,
             id={fieldId}
             rows={field.rows || 4}
             value={value}
+            disabled={saving}
             onChange={(event) => onChange(event.target.value)}
             className="min-w-0 flex-1 resize-y rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-base leading-7 text-white outline-none placeholder:text-slate-600 focus:border-lhu-blue"
           />
@@ -279,6 +283,7 @@ function ContentField({ field, value, dirty, saving, saved, uploading, onChange,
             id={fieldId}
             type="text"
             value={value}
+            disabled={saving}
             onChange={(event) => onChange(event.target.value)}
             className="min-h-12 min-w-0 flex-1 rounded-xl border border-white/10 bg-slate-950/70 px-4 text-base text-white outline-none placeholder:text-slate-600 focus:border-lhu-blue"
           />

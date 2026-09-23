@@ -2,6 +2,7 @@ import { execute } from '@/lib/db';
 import DynamicSection from '@/components/DynamicSection';
 import type { Product } from '@/components/ProductCard';
 import type { CustomSectionData } from '@/lib/types';
+import { contentValue } from '@/lib/site-content';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,17 +27,16 @@ async function getProducts(): Promise<Product[]> {
 }
 
 export default async function AcademicPage() {
-  const [sections, products] = await Promise.all([getAcademicSections(), getProducts()]);
+  const [sections, products, contentRows] = await Promise.all([getAcademicSections(), getProducts(), execute('SELECT SectionKey, Content FROM SiteContent', {})]);
+  const content: Record<string, string> = Object.fromEntries(contentRows.recordset.map(row => [row.SectionKey, row.Content]));
 
   return (
     <main className="overflow-x-hidden bg-background text-foreground">
       <section className="blueprint-surface relative overflow-hidden border-b border-card-border bg-[#07111d] pb-20 pt-40 text-white md:pb-28 md:pt-52">
         <div className="site-shell relative z-10">
-          <h1 className="font-display max-w-[17ch] text-[clamp(2.3rem,6.2vw,4.5rem)] font-[650] leading-[1.14] tracking-[-0.012em] text-white">
-            Ngành Công nghệ <span className="text-lhu-orange">Thông tin</span>
-          </h1>
+          <h1 className="font-display max-w-[17ch] text-[clamp(2.3rem,6.2vw,4.5rem)] font-[650] leading-[1.14] tracking-[-0.012em] text-white" dangerouslySetInnerHTML={{ __html: contentValue(content, 'academic_title') }} />
           <p className="mt-8 max-w-2xl text-lg leading-8 text-[#b5c6d3] md:text-xl md:leading-9">
-            Kiến tạo tương lai, làm chủ công nghệ và dẫn đầu thời đại số cùng Đại học Lạc Hồng.
+            {contentValue(content, 'academic_description')}
           </p>
           <div className="signal-line mt-10" aria-hidden="true" />
         </div>
@@ -64,10 +64,10 @@ export default async function AcademicPage() {
       <section className="public-content section-pad relative overflow-hidden bg-[var(--surface-2)] dark:bg-[#091725] text-foreground dark:text-white">
         <div className="site-shell relative z-10 grid gap-10 md:grid-cols-[1fr_auto] md:items-end">
           <div>
-            <h2 className="section-title max-w-[16ch] text-foreground dark:text-white">Sẵn sàng trở thành kỹ sư CNTT thế hệ mới?</h2>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-muted dark:text-[#a9bac8]">Đăng ký xét tuyển để tìm hiểu chương trình đào tạo và môi trường học tập thực chiến tại Đại học Lạc Hồng.</p>
+            <h2 className="section-title max-w-[16ch] text-foreground dark:text-white">{contentValue(content, 'academic_cta_title')}</h2>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-muted dark:text-[#a9bac8]">{contentValue(content, 'academic_cta_description')}</p>
           </div>
-          <a href="https://tuyensinh.lhu.edu.vn" target="_blank" rel="noreferrer" className="button-primary px-8">Đăng ký xét tuyển →</a>
+          <a href={contentValue(content, 'academic_cta_url')} target="_blank" rel="noreferrer" className="button-primary px-8">{contentValue(content, 'academic_cta_label')}</a>
         </div>
       </section>
     </main>

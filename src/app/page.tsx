@@ -1,3 +1,5 @@
+import { Fragment, type ReactNode } from 'react';
+import { getHomeLayout } from '@/lib/home-layout';
 import { query, execute } from '@/lib/db';
 import Hero from '@/components/Hero';
 import ProductGallery from '@/components/ProductGallery';
@@ -48,7 +50,7 @@ async function getContent(): Promise<Record<string, string>> {
 
 async function getCustomSections(): Promise<CustomSectionData[]> {
   try {
-    const result = await execute('SELECT * FROM CustomSections WHERE IsActive = 1 AND (PageKey = @pageKey OR PageKey = \'all\' OR PageKey IS NULL OR PageKey = \'\') ORDER BY OrderIndex ASC', { pageKey: 'home' });
+    const result = await execute('SELECT * FROM CustomSections WHERE (PageKey = @pageKey OR PageKey = \'all\' OR PageKey IS NULL OR PageKey = \'\') ORDER BY OrderIndex ASC, Id ASC', { pageKey: 'home' });
     return result.recordset;
   } catch (err) {
     console.error('Failed to fetch custom sections:', err);
@@ -58,7 +60,7 @@ async function getCustomSections(): Promise<CustomSectionData[]> {
 
 async function getStats(): Promise<StatData[]> {
   try {
-    const result = await query('SELECT * FROM Stats ORDER BY OrderIndex ASC');
+    const result = await query('SELECT * FROM Stats ORDER BY OrderIndex ASC, Id ASC');
     return result.recordset;
   } catch (err) {
     console.error('Failed to fetch stats:', err);
@@ -69,7 +71,7 @@ async function getStats(): Promise<StatData[]> {
 async function getQuizData(): Promise<QuizData> {
   try {
     const [questionsRes, optionsRes, resultsRes] = await Promise.all([
-      query('SELECT * FROM QuizQuestions ORDER BY OrderIndex ASC'),
+      query('SELECT * FROM QuizQuestions ORDER BY OrderIndex ASC, Id ASC'),
       query('SELECT * FROM QuizOptions ORDER BY QuestionId ASC, OrderIndex ASC'),
       query('SELECT * FROM QuizResults'),
     ]);
@@ -117,10 +119,8 @@ export default async function Home() {
     (section) => section.LayoutType === 'product-showcase',
   );
 
-  return (
-    <main className="overflow-x-hidden bg-background text-foreground transition-colors duration-500">
-      {/* Hero Section */}
-      <Hero 
+  const regions: Record<string, ReactNode> = {
+    hero: (<Hero
         title={contentValue(content, 'hero_title')}
         subtitle={contentValue(content, 'hero_subtitle')}
         productsLabel={contentValue(content, 'hero_products_label')}
@@ -131,16 +131,13 @@ export default async function Home() {
         scrollUrl={contentValue(content, 'hero_scroll_url')}
         videoSrc={contentValue(content, 'hero_video_src')}
         posterSrc={contentValue(content, 'hero_poster_src')}
-      />
-
-      {/* Stats Section */}
-      <StatsSection
+      />),
+    stats: (<StatsSection
         stats={stats}
         title={contentValue(content, 'stats_title')}
         description={contentValue(content, 'stats_description')}
-      />
-
-      <FacultySection
+      />),
+    faculty: (<FacultySection
         title={contentValue(content, 'faculty_title')}
         content={contentValue(content, 'about_faculty')}
         image={contentValue(content, 'about_faculty_image')}
@@ -151,10 +148,36 @@ export default async function Home() {
         featureTwo={contentValue(content, 'faculty_feature_two')}
         mediaCaption={contentValue(content, 'faculty_media_caption')}
         mediaLocation={contentValue(content, 'faculty_media_location')}
-      />
-
-      {!hasDynamicProductSection && (
-        <section id="products" className="public-content section-pad scroll-mt-24 relative overflow-hidden bg-[var(--surface-2)] text-foreground dark:bg-[#091725] dark:text-white">
+      />),
+    quiz: (<CareerQuiz
+        products={products}
+        quizData={quizData}
+        key={JSON.stringify(quizData)}
+        title={contentValue(content, 'quiz_title')}
+        description={contentValue(content, 'quiz_description')}
+        startTitle={contentValue(content, 'quiz_start_title')}
+        startDescription={contentValue(content, 'quiz_start_description')}
+        startButton={contentValue(content, 'quiz_start_button')}
+        steps={[
+          contentValue(content, 'quiz_step_one'),
+          contentValue(content, 'quiz_step_two'),
+          contentValue(content, 'quiz_step_three'),
+        ]}
+      />),
+    contact: (<ContactSection
+        title={contentValue(content, 'contact_title')}
+        description={contentValue(content, 'contact_description')}
+        address={contentValue(content, 'contact_address')}
+        phone={contentValue(content, 'contact_phone')}
+        email={contentValue(content, 'contact_email')}
+      />),
+    mission: (<MissionSection
+        title={contentValue(content, 'mission_title')}
+        content={contentValue(content, 'it_industry_info')}
+        ctaLabel={contentValue(content, 'mission_cta_label')}
+        ctaUrl={contentValue(content, 'mission_cta_url')}
+      />),
+    products: !hasDynamicProductSection ? (<section id="products" className="public-content section-pad scroll-mt-24 relative overflow-hidden bg-[var(--surface-2)] text-foreground dark:bg-[#091725] dark:text-white">
           <div className="site-shell">
             <div className="mb-14 grid gap-6 md:grid-cols-[1fr_.75fr] md:items-end">
               <h2 className="section-title text-foreground dark:text-white">
@@ -166,54 +189,26 @@ export default async function Home() {
             </div>
             <ProductGallery products={products} />
           </div>
-        </section>
-      )}
-
-      {/* Custom Dynamic Sections */}
-      {customSections.map((section) => (
-        <DynamicSection 
-          key={section.Id}
-          anchorId={section.LayoutType === 'product-showcase' ? 'products' : undefined}
-          title={section.Title}
-          subtitle={section.Subtitle}
-          layoutType={section.LayoutType}
-          bgStyle={section.BgStyle}
-          contentJson={section.ContentJson}
-          products={products}
-        />
-      ))}
-
-      {/* Career Quiz Section */}
-      <CareerQuiz
+        </section>) : null,
+  };
+  for (const section of customSections) {
+    regions[`section-${section.Id}`] = section.IsActive ? (
+      <DynamicSection
+        anchorId={section.LayoutType === 'product-showcase' ? 'products' : `section-${section.Id}`}
+        title={section.Title}
+        subtitle={section.Subtitle}
+        layoutType={section.LayoutType}
+        bgStyle={section.BgStyle}
+        contentJson={section.ContentJson}
         products={products}
-        quizData={quizData}
-        title={contentValue(content, 'quiz_title')}
-        description={contentValue(content, 'quiz_description')}
-        startTitle={contentValue(content, 'quiz_start_title')}
-        startDescription={contentValue(content, 'quiz_start_description')}
-        startButton={contentValue(content, 'quiz_start_button')}
-        steps={[
-          contentValue(content, 'quiz_step_one'),
-          contentValue(content, 'quiz_step_two'),
-          contentValue(content, 'quiz_step_three'),
-        ]}
       />
-
-      {/* Contact Section */}
-      <ContactSection 
-        title={contentValue(content, 'contact_title')}
-        description={contentValue(content, 'contact_description')}
-        address={contentValue(content, 'contact_address')}
-        phone={contentValue(content, 'contact_phone')}
-        email={contentValue(content, 'contact_email')}
-      />
-
-      <MissionSection
-        title={contentValue(content, 'mission_title')}
-        content={contentValue(content, 'it_industry_info')}
-        ctaLabel={contentValue(content, 'mission_cta_label')}
-        ctaUrl={contentValue(content, 'mission_cta_url')}
-      />
+    ) : null;
+  }
+  return (
+    <main className="overflow-x-hidden bg-background text-foreground transition-colors duration-500">
+      {getHomeLayout(content.home_layout, customSections).filter(region => region.visible).map(region => (
+        <Fragment key={region.id}>{regions[region.id]}</Fragment>
+      ))}
     </main>
   );
 }

@@ -30,7 +30,7 @@ export default function Navbar({ items, admissionsLabel, admissionsUrl }: Navbar
 
   return (
     <header className={`fixed inset-x-0 top-0 z-[1000] transition-all duration-300 ${isScrolled ? 'border-b border-white/8 bg-[#07111d]/92 py-3 shadow-[0_16px_40px_-28px_rgba(0,0,0,.9)] backdrop-blur-xl' : 'bg-transparent py-5'}`}>
-      <div className="site-shell flex items-center justify-between">
+      <div className="site-nav-shell site-shell flex items-center justify-between">
         <Link href="/" aria-label="LHU Tech Hub - Trang chủ" className="inline-flex min-h-11 items-center rounded-lg px-1">
           <BrandLogo />
         </Link>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query, execute } from '@/lib/db';
-import { revalidatePath } from 'next/cache';
+import { query, executeTransaction } from '@/lib/db';
+import { cmsResponse } from '@/lib/cms-response';
 
 interface ContentUpdate {
   SectionKey: unknown;
@@ -18,6 +18,13 @@ function parseUpdates(body: { SectionKey?: unknown; Content?: unknown; items?: u
     }
     if (typeof item.Content !== 'string') {
       throw new Error(`Nội dung của ${item.SectionKey} không hợp lệ.`);
+    }
+    if (item.SectionKey === 'home_layout') {
+      let layout: unknown;
+      try { layout = JSON.parse(item.Content); } catch { throw new Error('Bố cục không hợp lệ.'); }
+      if (!Array.isArray(layout) || layout.some(region => !region || typeof region.id !== 'string' || typeof region.visible !== 'boolean')) {
+        throw new Error('Bố cục không hợp lệ.');
+      }
     }
     return { SectionKey: item.SectionKey.trim(), Content: item.Content };
   });
@@ -39,20 +46,15 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Không có nội dung cần lưu.' }, { status: 400 });
     }
 
-    for (const { SectionKey, Content } of updates) {
-      await execute(
-        `IF EXISTS (SELECT 1 FROM SiteContent WHERE SectionKey = @SectionKey)
+    await executeTransaction(updates.map(({ SectionKey, Content }) => ({
+        sql: `IF EXISTS (SELECT 1 FROM SiteContent WITH (UPDLOCK, HOLDLOCK) WHERE SectionKey = @SectionKey)
           UPDATE SiteContent SET Content = @Content, LastUpdated = GETDATE() WHERE SectionKey = @SectionKey
          ELSE
           INSERT INTO SiteContent (SectionKey, Content) VALUES (@SectionKey, @Content)`,
-        { SectionKey, Content },
-      );
-    }
+        params: { SectionKey, Content },
+    })));
 
-    revalidatePath('/');
-    revalidatePath('/academic');
-
-    return NextResponse.json({ message: 'Content updated successfully', updated: updates.length });
+    return cmsResponse({ message: 'Content updated successfully', updated: updates.length });
   } catch (err) {
     console.error('Content Update Error:', err);
     const message = err instanceof Error && err.message.includes('không hợp lệ') ? err.message : 'Không thể cập nhật nội dung.';

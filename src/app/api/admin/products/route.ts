@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { cmsResponse } from '@/lib/cms-response';
 import { query, execute } from '@/lib/db';
 
 export async function GET() {
@@ -13,15 +14,15 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author } = body;
+    const { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author, IsVisible = true } = body;
 
     await execute(
       `INSERT INTO Products (Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author, IsVisible)
-       VALUES (@Name, @Description, @ImageUrl, @AppUrl, @TechTags, @CareerPath, @Year, @Author, 1)`,
-      { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author }
+       VALUES (@Name, @Description, @ImageUrl, @AppUrl, @TechTags, @CareerPath, @Year, @Author, @IsVisible)`,
+      { Name, Description, ImageUrl, AppUrl, TechTags, CareerPath, Year, Author, IsVisible: Boolean(IsVisible) }
     );
 
-    return NextResponse.json({ message: 'Product created successfully' });
+    return cmsResponse({ message: 'Product created successfully' });
   } catch (err) {
     console.error('Insert Error:', err);
     return NextResponse.json({ error: 'Insert failed' }, { status: 500 });
@@ -54,7 +55,7 @@ export async function PUT(req: NextRequest) {
       params
     );
 
-    return NextResponse.json({ message: 'Product updated successfully' });
+    return cmsResponse({ message: 'Product updated successfully' });
   } catch (err) {
     console.error('Update Error:', err);
     return NextResponse.json({ error: 'Update failed' }, { status: 500 });
@@ -76,7 +77,7 @@ export async function PATCH(req: NextRequest) {
       IsVisible: isVisible,
     });
 
-    return NextResponse.json({ message: isVisible ? 'Product shown' : 'Product hidden', IsVisible: isVisible });
+    return cmsResponse({ message: isVisible ? 'Product shown' : 'Product hidden', IsVisible: isVisible });
   } catch (err) {
     console.error('Visibility update error:', err);
     return NextResponse.json({ error: 'Visibility update failed' }, { status: 500 });
@@ -91,7 +92,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'Id required' }, { status: 400 });
 
     await execute('DELETE FROM Products WHERE Id = @id', { id: parseInt(id) });
-    return NextResponse.json({ message: 'Product deleted successfully' });
+    return cmsResponse({ message: 'Product deleted successfully' });
   } catch (err) {
     console.error('Delete Error:', err);
     return NextResponse.json({ error: 'Delete failed' }, { status: 500 });

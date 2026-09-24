@@ -1,23 +1,40 @@
 name: Deploy to Production
+run-name: Deploy main · ${{ github.sha }}
 
 on:
-  repository_dispatch:
-    types: [deploy-triggered-from-admin]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          DEPLOY_PATH: ${{ secrets.SERVER_PATH }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
+          envs: DEPLOY_PATH
+          command_timeout: 25m
           script: |
-            cd ${{ secrets.SERVER_PATH }}
-            git pull origin main
-            npm install
-            npm run build
-            pm2 restart all || npm run start
+            set -eu
+            test -n "$DEPLOY_PATH"
+            cd "$DEPLOY_PATH"
+            test "$(git branch --show-current)" = main
+            test -z "$(git status --porcelain --untracked-files=no)"
+            git pull --ff-only origin main
+            bash scripts/deploy-production.sh
